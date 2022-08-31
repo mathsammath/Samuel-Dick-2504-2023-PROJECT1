@@ -1,6 +1,6 @@
 # 2504_2022_project1 - Polynomial Factorization
 
-<span style="color:red">Warning - as of 31/8/2021 we are still making changes to this repo - so please do not mirror yet for working on the project.</span>.
+**Warning - as of 31/8/2021 we are still making changes to this repo - so please do not mirror yet for working on the project.**
 
 
 This project implements polynomial arithmetic and polynomial factorization for polynomials with integer coefficients. 
