@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(".")
+
 include("poly_factorization_project.jl")
 
 x = x_poly()
