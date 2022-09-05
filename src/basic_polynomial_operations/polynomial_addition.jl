@@ -7,35 +7,34 @@
 #############################################################################
 
 """
+Add a polynomial and a term.
+"""
+function +(p::Polynomial, t::Term)
+    p = deepcopy(p)
+    if t.degree > degree(p)
+        push!(p, t)
+    else
+        if !iszero(p.terms[t.degree + 1]) #+1 is due to indexing
+            p.terms[t.degree + 1] += t
+        else
+            p.terms[t.degree + 1] = t
+        end
+    end
+
+    return trim!(p)
+end
++(t::Term, p::Polynomial) = p + t
+
+"""
 Add two polynomials.
 """
 function +(p1::Polynomial, p2::Polynomial)::Polynomial
-    p1, p2 = deepcopy(p1), deepcopy(p2)
-    p3 = Polynomial()
-    while !iszero(p1) && !iszero(p2)
-        t1, t2 = leading(p1), leading(p2) 
-        if t1.degree == t2.degree
-            push!(p3, pop!(p1)+pop!(p2))
-        elseif t1.degree < t2.degree
-            push!(p3,pop!(p2))
-        else
-            push!(p3,pop!(p1))
-        end
+    p = deepcopy(p1)
+    for t in p2
+        p += t
     end
-    while !iszero(p1)
-        push!(p3,pop!(p1))
-    end
-    while !iszero(p2)
-        push!(p3,pop!(p2))
-    end
-    return p3
+    return p
 end
-
-"""
-Add a polynomial and a term.
-"""
-+(p::Polynomial, t::Term) = p + Polynomial(t)
-+(t::Term, p::Polynomial) = p + t
 
 """
 Add a polynomial and an integer.

@@ -12,7 +12,8 @@ Multiply two polynomials.
 function *(p1::Polynomial, p2::Polynomial)::Polynomial
     p_out = Polynomial()
     for t in p1
-        p_out = p_out + (t * p2)
+        new_summand = (t * p2)
+        p_out = p_out + new_summand
     end
     return p_out
 end

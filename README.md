@@ -1,8 +1,5 @@
 # 2504_2022_project1 - Polynomial Factorization
 
-**Warning - as of 31/8/2021 we are still making changes to this repo - so please do not mirror yet for working on the project.**
-
-
 This project implements polynomial arithmetic and polynomial factorization for polynomials with integer coefficients. 
 
 Students are supposed to fork the project and create their modifications and improvements according [Project1 description](https://courses.smp.uq.edu.au/MATH2504/2022/assessment_html/project1.html).
