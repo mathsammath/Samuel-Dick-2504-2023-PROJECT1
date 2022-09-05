@@ -20,3 +20,5 @@ include("src/polynomial.jl")
     include("src/basic_polynomial_operations/polynomial_division.jl")
     include("src/basic_polynomial_operations/polynomial_gcd.jl")
 include("src/polynomial_factorization/factor.jl")
+
+nothing
