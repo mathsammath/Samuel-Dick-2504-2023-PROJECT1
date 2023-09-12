@@ -10,6 +10,8 @@
 # Term type and construction #
 ##############################
 
+using Subscripts #Add this package to do superscripts.
+
 """
 A term.
 """
@@ -39,11 +41,26 @@ one(::Type{Term})::Term = Term(1,0)
 """
 Show a term.
 """
+#Updated this function to improve "pretty printing" of terms.
+#e.g. 2x^0 → 2, 3x^1 → 3x, 1x^4 → x⁴ 
 function show(io::IO, t::Term)
-    t.degree == 0 && print(io, t.coeff) # Term is a constant 
-    t.coeff == 1  && print(io, "x^$(t.degree)") # Coefficient is 1, linear
-    t.degree == 1 && t.coeff != 1 && print(io, "$(t.coeff)x") #Coefficient is 1, non-linear
-    t.degree != 1 && t.coeff != 1 && t.degree != 0 && print(io, "$(t.coeff)⋅x^$(t.degree)") #Other cases
+    if t.degree == 0
+        print(io, t.coeff)#constant 
+    elseif t.degree == 1
+        if t.coeff == 1
+            print(io, "x") #x
+        elseif t.coeff == -1
+            print(io, "-x") #-x
+        else 
+            print(io, "x", super("$(t.degree)"))#ax¹, a ≠ 1.
+        end
+    elseif t.coeff == 1
+        print(io, "x", super("$(t.degree)"))#xᵃ, a ≠ 1.
+    elseif t.coeff == -1
+        print(io, "-x", super("$(t.degree)"))#-xᵃ, a ≠ 1.
+    else
+        print(io, "$(t.coeff)⋅x", super("$(t.degree)")) #all other cases.
+    end 
 end 
 
 ########################

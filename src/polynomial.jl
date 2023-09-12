@@ -121,22 +121,29 @@ end
 # Display #
 ###########
 
+#Global variable declaring the order (of degree) that polynomials should be printed.
+global lowest_to_highest::Bool = false 
+
 """
 Show a polynomial.
 """
+#Updated to improve "pretty printing" of polynomials.
+#e.g. 3 + 4x^2 + -3x^3 → -3x³ + 4x² + 3
 function show(io::IO, p::Polynomial) 
     if iszero(p)
         print(io,"0")
     else
-        n = length(p.terms)
-        for (i,t) in enumerate(reverse(p.terms))
+        count = 0 #iterate through terms for now...
+        lowest_to_highest == false ? ordering = reverse(p.terms) : ordering = p.terms #ordering of terms depends on state of lowest_to_highest variable.
+        for (i,t) in enumerate(ordering)
             if !iszero(t)
-                if i == 1 #print first term
+                if count == 0 #first term
                     print(io, t)
-                else #from second term onwards 
-                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree))
-                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree))
+                else #all other terms
+                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) #Terms with positive coefficients are "added"
+                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) #Terms with negative coefficients are "subtracted"
                 end 
+                count += 1
             end
         end
     end
