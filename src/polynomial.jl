@@ -129,9 +129,14 @@ function show(io::IO, p::Polynomial)
         print(io,"0")
     else
         n = length(p.terms)
-        for (i,t) in enumerate(p.terms)
+        for (i,t) in enumerate(reverse(p.terms))
             if !iszero(t)
-                print(io, t, i != n ? " + " : "")
+                if i == 1 #print first term
+                    print(io, t)
+                else #from second term onwards 
+                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree))
+                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree))
+                end 
             end
         end
     end

@@ -9,7 +9,8 @@ include("poly_factorization_project.jl")
 println("Suppose we want to construct a polynomial. To do so, we can first construct
 the polynomial x.")
 @show x = x_poly()
-println("We can construct larger polynomials using this x polynomial.")
+println("We can construct larger polynomials using this x polynomial. Note these polynomials 
+have purposefully been defined over primes.")
 @show p1 = x^2 + x + 1
 @show p2 = x^7 + 2
 
