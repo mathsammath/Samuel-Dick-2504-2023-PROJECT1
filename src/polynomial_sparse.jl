@@ -25,8 +25,8 @@ struct PolynomialSparse
     #Inner constructor for 0 polynomial 
     function PolynomialSparse() 
         lst = MutableLinkedList{Term}()
-        append!(lst, Term(0,0)) #Append 0 term.
-        dict = Dict{Int, DataStructures.ListNode{Term}}(0 => lst.node.next)
+        #append!(lst, Term(0,0)) #Append 0 term.
+        dict = Dict{Int, DataStructures.ListNode{Term}}() #(0 => lst.node.next)
         return new(lst, dict)
     end
 
@@ -44,16 +44,15 @@ struct PolynomialSparse
     end     
 end 
 
-#=
 """
-This function maintains the invariant of the PolynomialSparse type so that 
-there are no zero terms beyond the highest non-zero term.
+This function maintains the invariant of the Sparse Polynomial type so that there are no zero terms beyond the highest
+non-zero term.
 """
 function trim!(p::PolynomialSparse)::PolynomialSparse
-    i = length(p.terms)
+    i = length(p.lst)
     while i > 1
-        if iszero(p.terms[i])
-            pop!(p.terms)
+        if iszero(p.lst[i])
+            pop!(p.lst)
         else
             break
         end
@@ -61,7 +60,7 @@ function trim!(p::PolynomialSparse)::PolynomialSparse
     end
     return p
 end
-=#
+
 
 """
 Construct a sparse polynomial with a single term.
@@ -154,7 +153,8 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::Polynomial, state=1) = iterate(p.terms, state)
+#unsure what this is actually doing???!!!
+iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state)
 
 ##############################
 # Queries about a polynomial #
@@ -168,35 +168,156 @@ length(p::PolynomialSparse) = length(p.lst)
 """
 The leading term of the polynomial.
 """
-leading(p::PolynomialSparse)::Term = isempty(p.terms) ? zero(Term) : last(p.terms) 
+leading(p::PolynomialSparse)::Term = isempty(p.lst) ? zero(Term) : last(p.lst) 
 
 """
 Returns the coefficients of the polynomial. (lowest to highest)
 """
-coeffs(p::PolynomialSparse)::Vector{Int} =sort([get_element(p.lst, p.dict, i).coeff for i in keys(p.dict)])
+coeffs(p::PolynomialSparse)::Vector{Int} = [i.coeff for i in p.lst]
 
 """
 The degree of the polynomial.
 """
-degree(p::Polynomial)::Int = leading(p).degree 
+degree(p::PolynomialSparse)::Int = leading(p).degree 
 
 """
 The content of the polynomial is the GCD of its coefficients.
 """
-content(p::Polynomial)::Int = euclid_alg(coeffs(p))
+content(p::PolynomialSparse)::Int = euclid_alg([i.coeff for i in p.lst])
 
 """
 Evaluate the polynomial at a point `x`.
 """
-evaluate(f::Polynomial, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
+evaluate(f::PolynomialSparse, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
 
-##################################################
+################################
+# Pushing and popping of terms #
+################################
 
 """
-Check if the polynomial is zero. FIX THIS
+Push a new term into the sparse polynomial.
 """
-iszero(p::PolynomialSparse)::Bool = p.dict[0] == [Term(0,0)]
+#If term of same degree as new term exists in polynomial, throw error otherwise, add term to polynomial. 
+function push!(p::PolynomialSparse, t::Term) 
+    get_element(p.lst, p.dict, t.degree) === nothing ? insert_sorted!(p.lst, p.dict, t.degree, t) : 
+        throw(ErrorException("Term with degree $(t.degree) already in polynomial."))
+end 
 
+"""
+Pop the leading term out of the sparse polynomial. When polynomial is 0, keep popping out 0.
+"""
+function pop!(p::PolynomialSparse)::Term 
+    popped_term = leading(p) #popped term in leading term of polynomial
+    if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
+        push!(p, zero(Term))
+    end 
+    delete_element!(p.lst, p.dict, leading(p).degree) #helper function to delete element 
+    return popped_term
+end
+
+"""
+Check if the polynomial is zero. 
+"""
+iszero(p::PolynomialSparse)::Bool = p.lst == zero(PolynomialSparse).lst
+
+#################################################################
+# Transformation of the polynomial to create another polynomial #
+#################################################################
+
+"""
+The negative of a sparse polynomial.
+"""
+-(p::PolynomialSparse) = Polynomial(map((pt)->-pt, p.lst))
+
+"""
+Create a new sparse polynomial which is the derivative of the sparse polynomial.
+"""
+function derivative(p::PolynomialSparse)::PolynomialSparse 
+    der_p = PolynomialSparse()
+    for term in p.lst
+        der_term = derivative(term)
+        !iszero(der_term) && push!(der_p,der_term)
+    end
+    return trim!(der_p)
+end
+
+#= Need to do operators before doing this!
+"""
+The prim part (multiply a polynomial by the inverse of its content).
+"""
+prim_part(p::PolynomialSparse) = p ÷ content(p)
+
+"""
+A square free polynomial.
+"""
+square_free(p::Polynomial, prime::Int)::Polynomial = (p ÷ gcd(p,derivative(p),prime))(prime)
+=#
+
+#################################
+# Queries about two polynomials #
+#################################
+
+"""
+Check if two sparse polynomials are the same
+"""
+==(p1::PolynomialSparse, p2::PolynomialSparse)::Bool = p1.lst == p2.lst
+
+"""
+Check if a sparse polynomial is equal to 0.
+"""
+#Note that in principle there is a problem here. E.g The polynomial 3 will return true to equalling the integer 2.
+==(p::PolynomialSparse, n::T) where T <: Real = iszero(p) == iszero(n)
+
+##################################################################
+# Operations with two objects where at least one is a polynomial #
+##################################################################
+
+"""
+Subtraction of two sparse polynomials.
+"""
+-(p1::PolynomialSparse, p2::PolynomialSparse)::PolynomialSparse = p1 + (-p2)
+
+"""
+Multiplication of sparse polynomial and term.
+"""
+*(t::Term, p1::PolynomialSparse)::PolynomialSparse = iszero(t) ? PolynomialSparse() : PolynomialSparse([i for i in map((pt)->t*pt, p1.lst)])
+*(p1::PolynomialSparse, t::Term)::PolynomialSparse = t*p1
+
+"""
+Multiplication of a sparse polynomial and an integer.
+"""
+*(n::Int, p::PolynomialSparse)::PolynomialSparse = p*Term(n,0)
+*(p::PolynomialSparse, n::Int)::PolynomialSparse = n*p
+
+"""
+Integer division of a sparse polynomial by an integer.
+
+Warning this may not make sense if n does not divide all the coefficients of p.
+"""
+÷(p::PolynomialSparse, n::Int) = (prime)->Polynomial(map((pt)->((pt ÷ n)(prime)), p.lst)) #not sure if this is even working???????
+"""
+Take the mod of a sparse polynomial with an integer.
+"""
+function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
+    f_out = PolynomialSparse()
+    for i in f.lst
+        f_out += mod(i,p) 
+    end 
+    return f_out        
+end
+
+"""
+Power of a sparse polynomial mod prime.
+"""
+function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
+    n < 0 && error("No negative power")
+    out = one(p)
+    for _ in 1:n
+        out *= p
+        out = mod(out, prime)
+    end
+    return out
+end
 
 ##########################################################
 ##########################################################
@@ -275,3 +396,21 @@ Returns the value associated with the key `key` or `nothing` if not in list.
 get_element(    lst::MutableLinkedList{V}, 
                 dict::Dict{K, DataStructures.ListNode{V}},
                 key::K) where {K,V} = haskey(dict, key) ? dict[key].data : nothing
+
+"""
+Assumes the dictionary `dict` has the key `key`. and it is pointing at the linked list.
+"""
+function delete_element!(   lst::MutableLinkedList{V}, 
+                            dict::Dict{K, DataStructures.ListNode{V}},
+                            key::K)::Nothing where {K,V}
+    haskey(dict, key) || error("Key is not in dict")
+
+    node = dict[key]
+    delete!(dict, key)
+
+    node.prev.next = node.next
+    node.next.prev = node.prev
+    lst.len -= 1
+
+    return nothing
+end

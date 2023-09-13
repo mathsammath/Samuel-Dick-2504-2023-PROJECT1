@@ -44,20 +44,12 @@ Show a term.
 #Updated this function to improve "pretty printing" of terms.
 #e.g. 2x^0 → 2, 3x^1 → 3x, 1x^4 → x⁴ 
 function show(io::IO, t::Term)
-    if t.degree == 0
-        print(io, t.coeff)#constant 
-    elseif t.degree == 1
-        if t.coeff == 1
-            print(io, "x") #x
-        elseif t.coeff == -1
-            print(io, "-x") #-x
-        else 
-            print(io, "x", super("$(t.degree)"))#ax¹, a ≠ 1.
-        end
-    elseif t.coeff == 1
-        print(io, "x", super("$(t.degree)"))#xᵃ, a ≠ 1.
-    elseif t.coeff == -1
-        print(io, "-x", super("$(t.degree)"))#-xᵃ, a ≠ 1.
+    if t.degree == 0 #constant 
+        print(io, t.coeff)
+    elseif t.degree == 1 #x ? -x : ax¹
+        t.coeff == 1 ? print(io, "x") : t.coeff == - 1 ? print(io, "-x") : print(io, "$(t.coeff)⋅x", super("$(t.degree)"))
+    elseif abs(t.coeff) == 1#xᵃ or -x^å
+        t.coeff == 1 ? print(io, "x", super("$(t.degree)")) : print(io, "-x", super("$(t.degree)"))#-xᵃ, a ≠ 1.
     else
         print(io, "$(t.coeff)⋅x", super("$(t.degree)")) #all other cases.
     end 
