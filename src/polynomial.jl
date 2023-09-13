@@ -72,7 +72,6 @@ Construct a polynomial of the form x^p-x.
 """
 cyclotonic_polynomial(p::Int) = Polynomial([Term(1,p), Term(-1,0)])
 
-
 """
 Construct a polynomial of the form x-n.
 """
