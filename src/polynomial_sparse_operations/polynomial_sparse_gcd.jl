@@ -6,11 +6,9 @@
 #############################################################################
 #############################################################################
 
-#NONE OF THIS WORKS YET
 """
 The extended euclid algorithm for polynomials modulo prime.
 """
-##NONE OF THIS WORKING NEED TO UNDERSTAND ALGORITHM>....
 function extended_euclid_alg(a::PolynomialSparse, b::PolynomialSparse, prime::Int)
     old_r, r = mod(a, prime), mod(b, prime)
     old_s, s = one(PolynomialSparse), zero(PolynomialSparse)

@@ -19,10 +19,10 @@ function divide(num::PolynomialSparse, den::PolynomialSparse)
         f, g = mod(num,p), mod(den,p)
         degree(f) < degree(num) && return nothing 
         iszero(g) && throw(DivideError())
-        q = Polynomial()
+        q = PolynomialSparse()
         prev_degree = degree(f)
         while degree(f) ≥ degree(g) 
-            h = Polynomial( (leading(f) ÷ leading(g))(p) )  #syzergy 
+            h = PolynomialSparse( (leading(f) ÷ leading(g))(p) )  #syzergy 
             f = mod((f - h*g), p)
             q = mod((q + h), p)  
             prev_degree == degree(f) && break

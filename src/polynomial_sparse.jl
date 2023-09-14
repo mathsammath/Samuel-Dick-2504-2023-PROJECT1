@@ -227,7 +227,7 @@ iszero(p::PolynomialSparse)::Bool = p.lst == zero(PolynomialSparse).lst
 """
 The negative of a sparse polynomial.
 """
--(p::PolynomialSparse) = Polynomial(map((pt)->-pt, p.lst))
+-(p::PolynomialSparse) = PolynomialSparse(map(t->-t, p))
 
 """
 Create a new sparse polynomial which is the derivative of the sparse polynomial.
@@ -241,7 +241,6 @@ function derivative(p::PolynomialSparse)::PolynomialSparse
     return trim!(der_p)
 end
 
-#= Need to do operators before doing this!
 """
 The prim part (multiply a polynomial by the inverse of its content).
 """
@@ -250,8 +249,7 @@ prim_part(p::PolynomialSparse) = p ÷ content(p)
 """
 A square free polynomial.
 """
-square_free(p::Polynomial, prime::Int)::Polynomial = (p ÷ gcd(p,derivative(p),prime))(prime)
-=#
+square_free(p::PolynomialSparse, prime::Int)::PolynomialSparse = (p ÷ gcd(p,derivative(p),prime))(prime)
 
 #################################
 # Queries about two polynomials #
@@ -294,7 +292,7 @@ Integer division of a sparse polynomial by an integer.
 
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
-÷(p::PolynomialSparse, n::Int) = (prime)->Polynomial(map((pt)->((pt ÷ n)(prime)), p.lst)) #not sure if this is even working???????
+÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) #not sure if this is even working???????
 """
 Take the mod of a sparse polynomial with an integer.
 """
