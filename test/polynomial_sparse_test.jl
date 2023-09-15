@@ -2,6 +2,9 @@
 #####################################################################################
 #
 # This file contains units tests for polynomial operations for sparse polynomial type
+# Randomly generated polynomials can be dense, i.e. x⁷ + 6x⁶ + 4x⁵ + 3x⁴ + 2x²
+# As such, the number of iterations of some tests relative to dense 
+# testing has been reduced.
 #                                                                               
 #####################################################################################
 #####################################################################################
@@ -10,7 +13,7 @@
 """
 Test product of sparse polynomials.
 """
-function prod_test_poly_sparse(;N::Int = 10^1, N_prods::Int = 20, seed::Int = 0) #obviously taking a very long time (relatively)
+function prod_test_poly_sparse(;N::Int = 30, N_prods::Int = 20, seed::Int = 0) #obviously taking a very long time (relatively)
     Random.seed!(seed)
     for _ in 1:N
         p1 = rand(PolynomialSparse)
@@ -34,7 +37,7 @@ end
 """
 Test derivative of sparse polynomials (as well as product).
 """
-function prod_derivative_test_poly_sparse(;N::Int = 10^2,  seed::Int = 0)
+function prod_derivative_test_poly_sparse(;N::Int = 30,  seed::Int = 0)
     Random.seed!(seed)
     for _ in 1:N
         p1 = rand(PolynomialSparse)
