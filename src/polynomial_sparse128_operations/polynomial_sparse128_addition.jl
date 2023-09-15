@@ -9,7 +9,7 @@
 """
 Add a sparse polynomial and a term.
 """
-function +(p::PolynomialSparse128, t::Term)
+function +(p::PolynomialSparse128, t::Term128)
     p = deepcopy(p)
     if t.degree ∈ [i.degree for i in p.lst] #Term of same degree exists in p
          for i in 1:length(p.lst)
@@ -39,5 +39,5 @@ end
 """
 Add a sparse polynomial and an integer.
 """
-+(p::PolynomialSparse128, n::Int) = p + Term(n,0)
-+(n::Int, p::PolynomialSparse128) = p + Term(n,0)
++(p::PolynomialSparse128, n::Int) = p + Term128(Int128(n),0)
++(n::Int, p::PolynomialSparse128) = p + Term128(Int128(n),0)

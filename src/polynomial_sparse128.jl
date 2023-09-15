@@ -17,23 +17,23 @@ A Polynomial type, PolynomialSparse128 - designed for sparse polynomials (such a
 with larger integer coefficients (Int128) than PolynomialSparse type (Int). 
 """
 struct PolynomialSparse128
-    lst::MutableLinkedList{Term}
-    dict::Dict{Int128, DataStructures.ListNode{Term}}
+    lst::MutableLinkedList{Term128}
+    dict::Dict{Int, DataStructures.ListNode{Term128}}
 
     #Inner constructor for 0 polynomial 
     function PolynomialSparse128() 
-        lst = MutableLinkedList{Term}()
-        append!(lst, Term(0,0)) #Zero polynomial contains a single term, 0
-        dict = Dict{Int, DataStructures.ListNode{Term}}(0 => lst.node.next)
+        lst = MutableLinkedList{Term128}()
+        append!(lst, Term128(Int128(0),0)) #Zero polynomial contains a single term, 0
+        dict = Dict{Int, DataStructures.ListNode{Term128}}(0 => lst.node.next)
         return new(lst, dict)
     end
 
     #Inner constructor that creates a sparse polynomial based on arbitrary list of terms
-    function PolynomialSparse128(vt::Vector{Term})
-        lst = MutableLinkedList{Term}()
-        dict = Dict{Int, DataStructures.ListNode{Term}}()
+    function PolynomialSparse128(vt::Vector{Term128})
+        lst = MutableLinkedList{Term128}()
+        dict = Dict{Int, DataStructures.ListNode{Term128}}()
         if isempty(vt)
-            vt = [zero(Term)]
+            vt = [zero(Term128)]
         end
         for t in vt
             insert_sorted!(lst, dict, t.degree, t)
@@ -63,22 +63,22 @@ end
 """
 Construct a sparse polynomial with a single term.
 """
-PolynomialSparse128(t::Term) = PolynomialSparse128([t])
+PolynomialSparse128(t::Term128) = PolynomialSparse128([t])
 
 """
 Construct a sparse polynomial of the form x^p-x.
 """
-cyclotonic_polynomial_sparse128(p::Int) = PolynomialSparse128([Term(1,p), Term(-1,0)])
+cyclotonic_polynomial_sparse128(p::Int) = PolynomialSparse128([Term128(Int128(1),p), Term128(Int128(-1),0)])
 
 """
 Construct a sparse polynomial of the form x-n.
 """
-linear_monic_polynomial_sparse128(n::Int) = PolynomialSparse128([Term(1,1), Term(-n,0)])
+linear_monic_polynomial_sparse128(n::Int) = PolynomialSparse128([Term128(Int128(1),1), Term128(Int128(-n),0)])
 
 """
 Construct a sparse polynomial of the form x.
 """
-x_poly_sparse128() = PolynomialSparse128(Term(1,1))
+x_poly_sparse128() = PolynomialSparse128(Term128(Int128(1),1))
 
 """
 Creates the zero sparse polynomial.
@@ -88,7 +88,7 @@ zero(::Type{PolynomialSparse128})::PolynomialSparse128 = PolynomialSparse128()
 """
 Creates the unit sparse polynomial.
 """
-one(::Type{PolynomialSparse128})::PolynomialSparse128 = PolynomialSparse128(one(Term))
+one(::Type{PolynomialSparse128})::PolynomialSparse128 = PolynomialSparse128(one(Term128))
 one(p::PolynomialSparse128) = one(typeof(p))
 
 """
@@ -109,7 +109,7 @@ function rand(::Type{PolynomialSparse128} ;
         degrees = vcat(sort(sample(0:_degree-1,_terms,replace = false)),_degree)
         coeffs = rand(1:max_coeff,_terms+1)
         monic && (coeffs[end] = 1)
-        p = PolynomialSparse128( [Term(coeffs[i],degrees[i]) for i in 1:length(degrees)] )
+        p = PolynomialSparse128( [Term128(Int128(coeffs[i]),degrees[i]) for i in 1:length(degrees)] )
         condition(p) && return p
     end
 end
@@ -135,8 +135,8 @@ function show(io::IO, p::PolynomialSparse128)
             if first_term == true 
                 print(io, t) 
             else 
-                sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) 
-                sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) 
+                sign(t.coeff) > 0 && print(io, " + ", Term128(Int128(abs(t.coeff)), t.degree)) 
+                sign(t.coeff) < 0 && print(io, " - ", Term128(Int128(abs(t.coeff)), t.degree)) 
             end 
             first_term = false
         end 
@@ -165,7 +165,7 @@ length(p::PolynomialSparse128) = length(p.lst)
 """
 The leading term of the polynomial.
 """
-leading(p::PolynomialSparse128)::Term = isempty(p.lst) ? zero(Term) : last(p.lst) 
+leading(p::PolynomialSparse128)::Term128 = isempty(p.lst) ? zero(Term128) : last(p.lst) 
 
 """
 Returns the coefficients of the polynomial. (lowest to highest)
@@ -195,7 +195,7 @@ evaluate(f::PolynomialSparse128, x::T) where T <: Number = sum(evaluate(t,x) for
 Push a new term into the sparse polynomial.
 """
 #If term of same degree as new term exists in polynomial, throw error otherwise, add term to polynomial. 
-function push!(p::PolynomialSparse128, t::Term) 
+function push!(p::PolynomialSparse128, t::Term128) 
     get_element(p.lst, p.dict, t.degree) === nothing ? insert_sorted!(p.lst, p.dict, t.degree, t) : 
         throw(ErrorException("Term with degree $(t.degree) already in polynomial."))
 end 
@@ -203,10 +203,10 @@ end
 """
 Pop the leading term out of the sparse polynomial. When polynomial is 0, keep popping out 0.
 """
-function pop!(p::PolynomialSparse128)::Term 
+function pop!(p::PolynomialSparse128)::Term128 
     popped_term = leading(p) #popped term in leading term of polynomial
     if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
-        push!(p, zero(Term))
+        push!(p, zero(Term128))
     end 
     delete_element!(p.lst, p.dict, leading(p).degree) #helper function to delete element 
     return popped_term
@@ -275,13 +275,13 @@ Subtraction of two sparse polynomials.
 """
 Multiplication of sparse polynomial and term.
 """
-*(t::Term, p1::PolynomialSparse128)::PolynomialSparse128 = iszero(t) ? PolynomialSparse128() : PolynomialSparse128([i for i in map((pt)->t*pt, p1.lst)])
-*(p1::PolynomialSparse128, t::Term)::PolynomialSparse128 = t*p1
+*(t::Term128, p1::PolynomialSparse128)::PolynomialSparse128 = iszero(t) ? PolynomialSparse128() : PolynomialSparse128([i for i in map((pt)->t*pt, p1.lst)])
+*(p1::PolynomialSparse128, t::Term128)::PolynomialSparse128 = t*p1
 
 """
 Multiplication of a sparse polynomial and an integer.
 """
-*(n::Int, p::PolynomialSparse128)::PolynomialSparse128 = p*Term(n,0)
+*(n::Int, p::PolynomialSparse128)::PolynomialSparse128 = p*Term128(Int128(n),0)
 *(p::PolynomialSparse128, n::Int)::PolynomialSparse128 = n*p
 
 """
