@@ -1,10 +1,8 @@
 #############################################################################
 #############################################################################
 #
-# This file defines the PolynomialSparse type that stores only nonzero terms 
-# using a non-trivial data structure involving a dictionary and a linked list.
-# Sparse polynomial type has identically functionality to the original 
-# polynomial type.
+# This file defines the PolynomialSparse128 type. Similar to PolynomialSparse
+# type, except coefficients not have Int128 values instead of Int.
 #                                                                               
 #############################################################################
 #############################################################################
@@ -14,16 +12,16 @@ using DataStructures
 ####################################
 # Polynomial type and construction #
 ####################################
-
 """
-A Polynomial type, PolynomialSparse - designed for sparse polynomials (such as xⁿ - 1). 
+A Polynomial type, PolynomialSparse128 - designed for sparse polynomials (such as xⁿ - 1)
+with larger integer coefficients (Int128) than PolynomialSparse type (Int). 
 """
-struct PolynomialSparse
+struct PolynomialSparse128
     lst::MutableLinkedList{Term}
-    dict::Dict{Int, DataStructures.ListNode{Term}}
+    dict::Dict{Int128, DataStructures.ListNode{Term}}
 
     #Inner constructor for 0 polynomial 
-    function PolynomialSparse() 
+    function PolynomialSparse128() 
         lst = MutableLinkedList{Term}()
         append!(lst, Term(0,0)) #Zero polynomial contains a single term, 0
         dict = Dict{Int, DataStructures.ListNode{Term}}(0 => lst.node.next)
@@ -31,7 +29,7 @@ struct PolynomialSparse
     end
 
     #Inner constructor that creates a sparse polynomial based on arbitrary list of terms
-    function PolynomialSparse(vt::Vector{Term})
+    function PolynomialSparse128(vt::Vector{Term})
         lst = MutableLinkedList{Term}()
         dict = Dict{Int, DataStructures.ListNode{Term}}()
         if isempty(vt)
@@ -48,7 +46,7 @@ end
 This function maintains the invariant of the Sparse Polynomial type so that there are no zero terms beyond the highest
 non-zero term.
 """
-function trim!(p::PolynomialSparse)::PolynomialSparse
+function trim!(p::PolynomialSparse128)::PolynomialSparse128
     i = length(p.lst)
     while i > 1
         if iszero(p.lst[i])
@@ -65,38 +63,38 @@ end
 """
 Construct a sparse polynomial with a single term.
 """
-PolynomialSparse(t::Term) = PolynomialSparse([t])
+PolynomialSparse128(t::Term) = PolynomialSparse128([t])
 
 """
 Construct a sparse polynomial of the form x^p-x.
 """
-cyclotonic_polynomial_sparse(p::Int) = PolynomialSparse([Term(1,p), Term(-1,0)])
+cyclotonic_polynomial_sparse128(p::Int) = PolynomialSparse128([Term(1,p), Term(-1,0)])
 
 """
 Construct a sparse polynomial of the form x-n.
 """
-linear_monic_polynomial_sparse(n::Int) = PolynomialSparse([Term(1,1), Term(-n,0)])
+linear_monic_polynomial_sparse128(n::Int) = PolynomialSparse128([Term(1,1), Term(-n,0)])
 
 """
 Construct a sparse polynomial of the form x.
 """
-x_poly_sparse() = PolynomialSparse(Term(1,1))
+x_poly_sparse128() = PolynomialSparse128(Term(1,1))
 
 """
 Creates the zero sparse polynomial.
 """
-zero(::Type{PolynomialSparse})::PolynomialSparse = PolynomialSparse()
+zero(::Type{PolynomialSparse128})::PolynomialSparse128 = PolynomialSparse128()
 
 """
 Creates the unit sparse polynomial.
 """
-one(::Type{PolynomialSparse})::PolynomialSparse = PolynomialSparse(one(Term))
-one(p::PolynomialSparse) = one(typeof(p))
+one(::Type{PolynomialSparse128})::PolynomialSparse128 = PolynomialSparse128(one(Term))
+one(p::PolynomialSparse128) = one(typeof(p))
 
 """
 Generates a random sparse polynomial.
 """
-function rand(::Type{PolynomialSparse} ; 
+function rand(::Type{PolynomialSparse128} ; 
                 degree::Int = -1, 
                 terms::Int = -1, 
                 max_coeff::Int = 100, 
@@ -111,7 +109,7 @@ function rand(::Type{PolynomialSparse} ;
         degrees = vcat(sort(sample(0:_degree-1,_terms,replace = false)),_degree)
         coeffs = rand(1:max_coeff,_terms+1)
         monic && (coeffs[end] = 1)
-        p = PolynomialSparse( [Term(coeffs[i],degrees[i]) for i in 1:length(degrees)] )
+        p = PolynomialSparse128( [Term(coeffs[i],degrees[i]) for i in 1:length(degrees)] )
         condition(p) && return p
     end
 end
@@ -127,7 +125,7 @@ Show a sparse polynomial. May need to change this to better suit sparse.
 #Updated to improve "pretty printing" of polynomials.
 #e.g. 3 + 4x^2 + -3x^3 → -3x³ + 4x² + 3
 #refactored slightly for sparse polynomials 
-function show(io::IO, p::PolynomialSparse) 
+function show(io::IO, p::PolynomialSparse128) 
     if iszero(p)
         print(io,"0")
     else
@@ -153,7 +151,7 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state)
+iterate(p::PolynomialSparse128, state=1) = iterate([i for i in p.lst], state)
 
 ##############################
 # Queries about a polynomial #
@@ -162,32 +160,32 @@ iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state)
 """
 The number of terms of the polynomial.
 """
-length(p::PolynomialSparse) = length(p.lst) 
+length(p::PolynomialSparse128) = length(p.lst) 
 
 """
 The leading term of the polynomial.
 """
-leading(p::PolynomialSparse)::Term = isempty(p.lst) ? zero(Term) : last(p.lst) 
+leading(p::PolynomialSparse128)::Term = isempty(p.lst) ? zero(Term) : last(p.lst) 
 
 """
 Returns the coefficients of the polynomial. (lowest to highest)
 """
-coeffs(p::PolynomialSparse)::Vector{Int} = [i.coeff for i in p.lst]
+coeffs(p::PolynomialSparse128)::Vector{Int} = [i.coeff for i in p.lst]
 
 """
 The degree of the polynomial.
 """
-degree(p::PolynomialSparse)::Int = leading(p).degree 
+degree(p::PolynomialSparse128)::Int = leading(p).degree 
 
 """
 The content of the polynomial is the GCD of its coefficients.
 """
-content(p::PolynomialSparse)::Int = euclid_alg(coeffs(p))
+content(p::PolynomialSparse128)::Int = euclid_alg(coeffs(p))
 
 """
 Evaluate the polynomial at a point `x`.
 """
-evaluate(f::PolynomialSparse, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
+evaluate(f::PolynomialSparse128, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
 
 ################################
 # Pushing and popping of terms #
@@ -197,7 +195,7 @@ evaluate(f::PolynomialSparse, x::T) where T <: Number = sum(evaluate(t,x) for t 
 Push a new term into the sparse polynomial.
 """
 #If term of same degree as new term exists in polynomial, throw error otherwise, add term to polynomial. 
-function push!(p::PolynomialSparse, t::Term) 
+function push!(p::PolynomialSparse128, t::Term) 
     get_element(p.lst, p.dict, t.degree) === nothing ? insert_sorted!(p.lst, p.dict, t.degree, t) : 
         throw(ErrorException("Term with degree $(t.degree) already in polynomial."))
 end 
@@ -205,7 +203,7 @@ end
 """
 Pop the leading term out of the sparse polynomial. When polynomial is 0, keep popping out 0.
 """
-function pop!(p::PolynomialSparse)::Term 
+function pop!(p::PolynomialSparse128)::Term 
     popped_term = leading(p) #popped term in leading term of polynomial
     if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
         push!(p, zero(Term))
@@ -217,7 +215,7 @@ end
 """
 Check if the polynomial is zero. 
 """
-iszero(p::PolynomialSparse)::Bool = p.lst == zero(PolynomialSparse).lst
+iszero(p::PolynomialSparse128)::Bool = p.lst == zero(PolynomialSparse128).lst
 
 #################################################################
 # Transformation of the polynomial to create another polynomial #
@@ -226,13 +224,13 @@ iszero(p::PolynomialSparse)::Bool = p.lst == zero(PolynomialSparse).lst
 """
 The negative of a sparse polynomial.
 """
--(p::PolynomialSparse) = PolynomialSparse(map(t->-t, p))
+-(p::PolynomialSparse128) = PolynomialSparse128(map(t->-t, p))
 
 """
 Create a new sparse polynomial which is the derivative of the sparse polynomial.
 """
-function derivative(p::PolynomialSparse)::PolynomialSparse 
-    der_p = PolynomialSparse()
+function derivative(p::PolynomialSparse128)::PolynomialSparse128 
+    der_p = PolynomialSparse128()
     for term in p.lst
         der_term = derivative(term)
         !iszero(der_term) && push!(der_p,der_term)
@@ -243,12 +241,12 @@ end
 """
 The prim part (multiply a polynomial by the inverse of its content).
 """
-prim_part(p::PolynomialSparse) = p ÷ content(p)
+prim_part(p::PolynomialSparse128) = p ÷ content(p)
 
 """
 A square free polynomial.
 """
-square_free(p::PolynomialSparse, prime::Int)::PolynomialSparse = (p ÷ gcd(p,derivative(p),prime))(prime)
+square_free(p::PolynomialSparse128, prime::Int)::PolynomialSparse128 = (p ÷ gcd(p,derivative(p),prime))(prime)
 
 #################################
 # Queries about two polynomials #
@@ -257,13 +255,13 @@ square_free(p::PolynomialSparse, prime::Int)::PolynomialSparse = (p ÷ gcd(p,der
 """
 Check if two sparse polynomials are the same
 """
-==(p1::PolynomialSparse, p2::PolynomialSparse)::Bool = p1.lst == p2.lst
+==(p1::PolynomialSparse128, p2::PolynomialSparse128)::Bool = p1.lst == p2.lst
 
 """
 Check if a sparse polynomial is equal to 0.
 """
 #Note that in principle there is a problem here. E.g The polynomial 3 will return true to equalling the integer 2.
-==(p::PolynomialSparse, n::T) where T <: Real = iszero(p) == iszero(n)
+==(p::PolynomialSparse128, n::T) where T <: Real = iszero(p) == iszero(n)
 
 ##################################################################
 # Operations with two objects where at least one is a polynomial #
@@ -272,31 +270,31 @@ Check if a sparse polynomial is equal to 0.
 """
 Subtraction of two sparse polynomials.
 """
--(p1::PolynomialSparse, p2::PolynomialSparse)::PolynomialSparse = p1 + (-p2)
+-(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse128 = p1 + (-p2)
 
 """
 Multiplication of sparse polynomial and term.
 """
-*(t::Term, p1::PolynomialSparse)::PolynomialSparse = iszero(t) ? PolynomialSparse() : PolynomialSparse([i for i in map((pt)->t*pt, p1.lst)])
-*(p1::PolynomialSparse, t::Term)::PolynomialSparse = t*p1
+*(t::Term, p1::PolynomialSparse128)::PolynomialSparse128 = iszero(t) ? PolynomialSparse128() : PolynomialSparse128([i for i in map((pt)->t*pt, p1.lst)])
+*(p1::PolynomialSparse128, t::Term)::PolynomialSparse128 = t*p1
 
 """
 Multiplication of a sparse polynomial and an integer.
 """
-*(n::Int, p::PolynomialSparse)::PolynomialSparse = p*Term(n,0)
-*(p::PolynomialSparse, n::Int)::PolynomialSparse = n*p
+*(n::Int, p::PolynomialSparse128)::PolynomialSparse128 = p*Term(n,0)
+*(p::PolynomialSparse128, n::Int)::PolynomialSparse128 = n*p
 
 """
 Integer division of a sparse polynomial by an integer.
 
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
-÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) 
+÷(p::PolynomialSparse128, n::Int) = (prime)->PolynomialSparse128(map((pt)->((pt ÷ n)(prime)), p.lst)) 
 """
 Take the mod of a sparse polynomial with an integer.
 """
-function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
-    f_out = PolynomialSparse()
+function mod(f::PolynomialSparse128, p::Int)::PolynomialSparse128
+    f_out = PolynomialSparse128()
     for i in f.lst
         f_out += mod(i,p) 
     end 
@@ -306,7 +304,7 @@ end
 """
 Power of a sparse polynomial mod prime.
 """
-function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
+function pow_mod(p::PolynomialSparse128, n::Int, prime::Int)
     n < 0 && error("No negative power")
     out = one(p)
     for _ in 1:n
@@ -319,7 +317,7 @@ end
 ##########################################################
 ##########################################################
 #
-# Helper functions for building the PolynomialSparse type
+# Helper functions for building the PolynomialSparse128 type
 #                                                                               
 ##########################################################
 ##########################################################

@@ -319,14 +319,6 @@ function mod(f::PolynomialDense, p::Int)::PolynomialDense
         f_out.terms[i] = mod(f_out.terms[i], p)
     end
     return trim!(f_out)
-        
-    # p_out = Polynomial()
-    # for t in f
-    #     new_term = mod(t, p)
-    #     @show new_term
-    #     push!(p_out, new_term)
-    # end
-    # return p_out
 end
 
 """

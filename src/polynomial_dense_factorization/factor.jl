@@ -13,7 +13,6 @@ Returns a vector of tuples of (irreducible polynomials (mod p), multiplicity) su
 """
 function factor(f::PolynomialDense, prime::Int)::Vector{Tuple{PolynomialDense,Int}}
     #Cantor Zassenhaus factorization
-
     f_modp = mod(f, prime)
     degree(f_modp) ≤ 1 && return [(f_modp,1)]
 
