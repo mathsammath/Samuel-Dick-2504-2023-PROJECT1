@@ -6,12 +6,12 @@ Pkg.activate(".")
 include("poly_factorization_project.jl")
 
 # Constructing Polynomials 
-println("Suppose we want to construct a polynomial. To do so, we can first construct
+println("Suppose we want to construct a polynomial of dense type. To do so, we can first construct
 the polynomial x.")
-@show x = x_poly()
+@show x = x_poly_sparse()
 println("We can construct larger polynomials using this x polynomial. Note these polynomials 
 have purposefully been defined over primes.")
-@show p1 = x^2 + x + 1
+@show p1 = x^5 + x + 1
 @show p2 = x^7 + 2
 
 println()
@@ -32,10 +32,11 @@ taking the gcd of polynomials, modular arithmetic over polynomials & computing d
 @show gcd(p1, p2, 3)
 @show mod(p1, 7)
 @show pow_mod(p1, 4, 13)
-@show derivative(p1)
+@show derivative(p2)
 
 println()
 
+#=
 println("Factorization of polynomials is a key part of the code. We can 
 factor polynomials mod primes & expand factorizations")
 @show factorization = factor(p1, 3)
@@ -54,8 +55,7 @@ println("We can apply the Euclidean algorithm on all three numbers:")
 
 println("We could also take the integer inverse symmetric mod of 2 and 6:")
 @show int_inverse_mod(2, 6)
-
-
+=#
 
 
 

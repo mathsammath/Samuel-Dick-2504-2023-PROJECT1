@@ -1,7 +1,7 @@
 #############################################################################
 #############################################################################
 #
-# This file implements factorization 
+# This file implements factorization for dense polynomials
 #                                                                               
 #############################################################################
 #############################################################################
@@ -11,7 +11,7 @@ Factors a polynomial over the field Z_p.
 
 Returns a vector of tuples of (irreducible polynomials (mod p), multiplicity) such that their product of the list (mod p) is f. Irreducibles are fixed points on the function factor.
 """
-function factor(f::Polynomial, prime::Int)::Vector{Tuple{Polynomial,Int}}
+function factor(f::PolynomialDense, prime::Int)::Vector{Tuple{PolynomialDense,Int}}
     #Cantor Zassenhaus factorization
 
     f_modp = mod(f, prime)
@@ -33,7 +33,7 @@ function factor(f::Polynomial, prime::Int)::Vector{Tuple{Polynomial,Int}}
 
     dds = dd_factor(ff, prime)
 
-    ret_val = Tuple{Polynomial,Int}[]
+    ret_val = Tuple{PolynomialDense,Int}[]
 
     for (k,dd) in enumerate(dds)
         sp = dd_split(dd, k, prime)
@@ -44,7 +44,7 @@ function factor(f::Polynomial, prime::Int)::Vector{Tuple{Polynomial,Int}}
     end
 
     #Append the leading coefficient as well
-    push!(ret_val, (leading(f_modp).coeff* one(Polynomial), 1) )
+    push!(ret_val, (leading(f_modp).coeff* one(PolynomialDense), 1) )
 
     return ret_val
 end
@@ -52,7 +52,7 @@ end
 """
 Expand a factorization.
 """
-function expand_factorization(factorization::Vector{Tuple{Polynomial,Int}})::Polynomial 
+function expand_factorization(factorization::Vector{Tuple{PolynomialDense,Int}})::PolynomialDense
     length(factorization) == 1 && return first(factorization[1])^last(factorization[1])
     return *([first(tt)^last(tt) for tt in factorization]...)
 end
@@ -60,7 +60,7 @@ end
 """
 Compute the number of times g divides f
 """
-function multiplicity(f::Polynomial, g::Polynomial, prime::Int)::Int
+function multiplicity(f::PolynomialDense, g::PolynomialDense, prime::Int)::Int
     degree(gcd(f, g, prime)) == 0 && return 0
     return 1 + multiplicity((f ÷ g)(prime), g, prime)
 end
@@ -71,10 +71,10 @@ Distinct degree factorization.
 
 Given a square free polynomial `f` returns a list, `g` such that `g[k]` is a product of irreducible polynomials of degree `k` for `k` in 1,...,degree(f) ÷ 2, such that the product of the list (mod `prime`) is equal to `f` (mod `prime`).
 """
-function dd_factor(f::Polynomial, prime::Int)::Array{Polynomial}
+function dd_factor(f::PolynomialDense, prime::Int)::Array{PolynomialDense}
     x = x_poly()
     w = deepcopy(x)
-    g = Array{Polynomial}(undef,degree(f)) #Array of polynomials indexed by degree
+    g = Array{PolynomialDense}(undef,degree(f)) #Array of polynomials indexed by degree
 
     #Looping over degrees
     for k in 1:degree(f)
@@ -85,7 +85,7 @@ function dd_factor(f::Polynomial, prime::Int)::Array{Polynomial}
 
 
     #edge case for final factor
-    f != one(Polynomial) && push!(g,f)
+    f != one(PolynomialDense) && push!(g,f)
     
     return g
 end
@@ -95,14 +95,14 @@ Distinct degree split.
 
 Returns a list of irreducible polynomials of degree `d` so that the product of that list (mod prime) is the polynomial `f`.
 """
-function dd_split(f::Polynomial, d::Int, prime::Int)::Vector{Polynomial}
+function dd_split(f::PolynomialDense, d::Int, prime::Int)::Vector{PolynomialDense}
     f = mod(f,prime)
     degree(f) == d && return [f]
     degree(f) == 0 && return []
-    w = rand(Polynomial, degree = d, monic = true)
+    w = rand(PolynomialDense, degree = d, monic = true)
     w = mod(w,prime)
     n_power = (prime^d-1) ÷ 2
-    g = gcd(pow_mod(w,n_power,prime) - one(Polynomial), f, prime)
+    g = gcd(pow_mod(w,n_power,prime) - one(PolynomialDense), f, prime)
     ḡ = (f ÷ g)(prime) # g\bar + [TAB]
     return vcat(dd_split(g, d, prime), dd_split(ḡ, d, prime) )
 end

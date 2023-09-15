@@ -10,8 +10,6 @@
 # Term type and construction #
 ##############################
 
-using Subscripts #Add this package to do superscripts.
-
 """
 A term.
 """
@@ -44,15 +42,15 @@ Show a term.
 #Updated this function to improve "pretty printing" of terms.
 #e.g. 2x^0 → 2, 3x^1 → 3x, 1x^4 → x⁴ 
 function show(io::IO, t::Term)
-    if t.degree == 0 #constant 
-        print(io, t.coeff)
-    elseif t.degree == 1 #x ? -x : ax¹
-        t.coeff == 1 ? print(io, "x") : t.coeff == - 1 ? print(io, "-x") : print(io, "$(t.coeff)⋅x", super("$(t.degree)"))
-    elseif abs(t.coeff) == 1#xᵃ or -x^å
-        t.coeff == 1 ? print(io, "x", super("$(t.degree)")) : print(io, "-x", super("$(t.degree)"))#-xᵃ, a ≠ 1.
-    else
-        print(io, "$(t.coeff)⋅x", super("$(t.degree)")) #all other cases.
-    end 
+    if t.degree == 0 
+        print(io, t.coeff) #constant 
+    elseif t.degree == 1 
+        t.coeff == 1 ? print(io, "x") : t.coeff == - 1 ? print(io, "-x") : print(io, "$(t.coeff)⋅x") #x, -x, ax
+    elseif abs(t.coeff) == 1 
+        t.coeff == 1 ? print(io, "x", super_index(t.degree)) : print(io, "-x", super_index(t.degree)) #xᵃ, -xᵃ
+    else 
+        print(io, "$(t.coeff)⋅x", super_index(t.degree)) #all other cases
+    end
 end 
 
 ########################
@@ -124,3 +122,35 @@ end
 Integer divide a term by an integer.
 """
 ÷(t::Term, n::Int) = t ÷ Term(n,0)
+
+##########################################################
+##########################################################
+#
+# Helper functions for Term type
+#                                                                               
+##########################################################
+##########################################################
+
+"""
+Returns an integer as a superscript. e.g. 1 → ¹.
+"""
+function super_index(n::Int)::String
+    super_dict = Dict(
+        '0' => "⁰",
+        '1' => "¹",
+        '2' => "²",
+        '3' => "³",
+        '4' => "⁴",
+        '5' => "⁵",
+        '6' => "⁶",
+        '7' => "⁷",
+        '8' => "⁸",
+        '9' => "⁹"
+    )
+    n_string = string(n)
+    super_string = ""
+    for i in n_string 
+        super_string *= super_dict[i]
+    end 
+    return super_string 
+end 

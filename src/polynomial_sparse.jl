@@ -25,8 +25,8 @@ struct PolynomialSparse
     #Inner constructor for 0 polynomial 
     function PolynomialSparse() 
         lst = MutableLinkedList{Term}()
-        #append!(lst, Term(0,0)) #Append 0 term.
-        dict = Dict{Int, DataStructures.ListNode{Term}}() #(0 => lst.node.next)
+        append!(lst, Term(0,0)) #Append 0 Term.
+        dict = Dict{Int, DataStructures.ListNode{Term}}(0 => lst.node.next)
         return new(lst, dict)
     end
 
@@ -119,30 +119,29 @@ end
 ###########
 # Display #
 ###########
+#come back to this.
 
 """
 Show a sparse polynomial. May need to change this to better suit sparse. 
 """
 #Updated to improve "pretty printing" of polynomials.
 #e.g. 3 + 4x^2 + -3x^3 → -3x³ + 4x² + 3
+#refactored slightly for sparse polynomials 
 function show(io::IO, p::PolynomialSparse) 
     if iszero(p)
         print(io,"0")
     else
-        terms = sort([get_element(p.lst, p.dict, i) for i in keys(p.dict)]) #repeatability of code. create array of terms.
-        count = 0 #iterate through terms for now...
-        lowest_to_highest == false ? ordering = reverse(terms) : ordering = terms #ordering of terms depends on state of lowest_to_highest variable.
+        first_term = true
+        lowest_to_highest == false ? ordering = reverse(p.lst) : ordering = x.lst
         for (i,t) in enumerate(ordering)
-            if !iszero(t)
-                if count == 0 #first term
-                    print(io, t)
-                else #all other terms
-                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) #Terms with positive coefficients are "added"
-                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) #Terms with negative coefficients are "subtracted"
-                end 
-                count += 1
-            end
-        end
+            if first_term == true 
+                print(io, t) 
+            else 
+                sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) 
+                sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) 
+            end 
+            first_term = false
+        end 
     end
 end
 
@@ -150,10 +149,10 @@ end
 # Iteration over the terms of the polynomial #
 ##############################################
 
+
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-#unsure what this is actually doing???!!!
 iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state)
 
 ##############################
@@ -183,7 +182,7 @@ degree(p::PolynomialSparse)::Int = leading(p).degree
 """
 The content of the polynomial is the GCD of its coefficients.
 """
-content(p::PolynomialSparse)::Int = euclid_alg([i.coeff for i in p.lst])
+content(p::PolynomialSparse)::Int = euclid_alg(coeffs(p))
 
 """
 Evaluate the polynomial at a point `x`.
@@ -292,7 +291,7 @@ Integer division of a sparse polynomial by an integer.
 
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
-÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) #not sure if this is even working???????
+÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) 
 """
 Take the mod of a sparse polynomial with an integer.
 """
@@ -301,7 +300,7 @@ function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
     for i in f.lst
         f_out += mod(i,p) 
     end 
-    return f_out        
+    return f_out     
 end
 
 """

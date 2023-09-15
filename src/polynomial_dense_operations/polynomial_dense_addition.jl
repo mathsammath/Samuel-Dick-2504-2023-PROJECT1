@@ -1,7 +1,7 @@
 #############################################################################
 #############################################################################
 #
-# This file implements polynomial addition 
+# This file implements polynomial addition for dense polynomials
 #                                                                               
 #############################################################################
 #############################################################################
@@ -9,7 +9,7 @@
 """
 Add a polynomial and a term.
 """
-function +(p::Polynomial, t::Term)
+function +(p::PolynomialDense, t::Term)
     p = deepcopy(p)
     if t.degree > degree(p)
         push!(p, t)
@@ -23,12 +23,12 @@ function +(p::Polynomial, t::Term)
 
     return trim!(p)
 end
-+(t::Term, p::Polynomial) = p + t
++(t::Term, p::PolynomialDense) = p + t
 
 """
 Add two polynomials.
 """
-function +(p1::Polynomial, p2::Polynomial)::Polynomial
+function +(p1::PolynomialDense, p2::PolynomialDense)::PolynomialDense
     p = deepcopy(p1)
     for t in p2
         p += t
@@ -39,5 +39,5 @@ end
 """
 Add a polynomial and an integer.
 """
-+(p::Polynomial, n::Int) = p + Term(n,0)
-+(n::Int, p::Polynomial) = p + Term(n,0)
++(p::PolynomialDense, n::Int) = p + Term(n,0)
++(n::Int, p::PolynomialDense) = p + Term(n,0)

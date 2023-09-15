@@ -28,7 +28,7 @@ function divide(num::PolynomialSparse, den::PolynomialSparse)
             prev_degree == degree(f) && break
             prev_degree = degree(f)
         end
-        @assert iszero( mod((num  - (q*g + f)),p))
+        @assert iszero(mod((num  - (q*g + f)),p))
         return q, f
     end
     return division_function
