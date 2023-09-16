@@ -23,8 +23,7 @@ struct PolynomialSparse128
     #Inner constructor for 0 polynomial 
     function PolynomialSparse128() 
         lst = MutableLinkedList{Term128}()
-        append!(lst, Term128(Int128(0),0)) #Zero polynomial contains a single term, 0
-        dict = Dict{Int, DataStructures.ListNode{Term128}}(0 => lst.node.next)
+        dict = Dict{Int, DataStructures.ListNode{Term128}}()
         return new(lst, dict)
     end
 
@@ -215,7 +214,7 @@ end
 """
 Check if the polynomial is zero. 
 """
-iszero(p::PolynomialSparse128)::Bool = p.lst == zero(PolynomialSparse128).lst
+iszero(p::PolynomialSparse128)::Bool = p.lst == zero(PolynomialSparse128).lst || p.lst == MutableLinkedList{Term128}(Term128(Int128(0),0))
 
 #################################################################
 # Transformation of the polynomial to create another polynomial #

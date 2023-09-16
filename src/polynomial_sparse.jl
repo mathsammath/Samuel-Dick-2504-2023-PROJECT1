@@ -205,7 +205,7 @@ end
 Pop the leading term out of the sparse polynomial. When polynomial is 0, keep popping out 0.
 """
 function pop!(p::PolynomialSparse)::Term 
-    popped_term = leading(p) #popped term in leading term of polynomial
+    popped_term = leading(p) #popped term in leading term of polynomial 
     if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
         push!(p, zero(Term))
     end 
