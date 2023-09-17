@@ -290,7 +290,16 @@ Subtraction of two sparse polynomials.
 """
 Multiplication of sparse polynomial and term.
 """
-*(t::Term, p1::PolynomialSparse)::PolynomialSparse = iszero(t) ? PolynomialSparse() : PolynomialSparse([i for i in map((pt)->t*pt, p1.lst)])
+function *(t::Term, p1::PolynomialSparse)::PolynomialSparse 
+     iszero(t) ? PolynomialSparse() : 
+     p2 = deepcopy(p1) #pop! mutates p1
+     p = PolynomialSparse() #initialise 
+     for _ in 1:length(p2)
+        push!(p, pop!(p2)*t)
+     end 
+     return p 
+end 
+
 *(p1::PolynomialSparse, t::Term)::PolynomialSparse = t*p1
 
 """
@@ -309,11 +318,12 @@ Warning this may not make sense if n does not divide all the coefficients of p.
 Take the mod of a sparse polynomial with an integer.
 """
 function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
-    f_out = PolynomialSparse()
-    for i in f.lst
-        f_out += mod(i,p) 
+    q = PolynomialSparse() #initialise 
+    f_copy = deepcopy(f)
+    for _ in 1:length(f_copy)
+        !iszero(mod(leading(f_copy)), p) && push!(q, mod(pop!(f_copy), p)) 
     end 
-    return f_out     
+    return f_copy      
 end
 
 """
