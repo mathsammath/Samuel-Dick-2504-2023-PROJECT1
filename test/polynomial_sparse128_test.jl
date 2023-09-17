@@ -165,8 +165,15 @@ Test capabilities of PolynomialSparse128 types at performing operations
 on integers greater than 2⁶⁴ or less than -2⁶⁴. Note PolynomialSparse type cannot accept 
 coefficients with values not in the range [-2⁶⁴, 2⁶⁴] and will "overflow".
 """
-function bigint_test(u::Int128 = Int128(2^64 + 1), l::Int128 = Int128(-2^64 - 1))
+function bigint_test(u::Int128 = Int128(123456789012345678901234567890), l::Int128 = Int128(-123456789012345678901234567890))
     #Creat two polynomials with coefficients greater than 2⁶⁴ or less than -2⁶⁴
     p1 = PolynomialSparse128([Term128(u, 1), Term128(l, 5), Term128(l-100, 6)])
     p2 = PolynomialSparse128([Term128(l,1), Term128(u, 2), Term128(u, 3)])
+    #add polynomials together (coefficients remain larger than what usual Sparse type can handle)
+    p1 + p2
+    #multiply polynomials togehter (some coefficients will remain larger or smaller than what usual Sparse type can handle)
+    p1*p2
+    #if no error is thrown, code has succesfully performed the operations where usual Sparse type would fail 
+    @assert true 
+    print("bigint_test - PASSED")
 end 

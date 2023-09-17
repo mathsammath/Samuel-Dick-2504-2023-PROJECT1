@@ -153,6 +153,5 @@ function mod_test_poly_sparse(p::Int = 7, q::Int = 5)
     @assert mod(p3, p).lst == MutableLinkedList{Term}(Term(0,0), Term(2,4), Term(1,6), Term(1,7))
     #mod(p3, 5) = x⁷ + x⁶ + 2⋅x⁵
     @assert mod(p3, q).lst == MutableLinkedList{Term}(Term(0,0), Term(2,5), Term(1,6), Term(1,7))
-
     println("mod_test_poly_sparse - PASSED")
 end 

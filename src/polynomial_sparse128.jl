@@ -169,7 +169,7 @@ leading(p::PolynomialSparse128)::Term128 = isempty(p.lst) ? zero(Term128) : last
 """
 Returns the coefficients of the polynomial. (lowest to highest)
 """
-coeffs(p::PolynomialSparse128)::Vector{Int} = [i.coeff for i in p.lst]
+coeffs(p::PolynomialSparse128)::Vector{Int128} = [i.coeff for i in p.lst]
 
 """
 The degree of the polynomial.

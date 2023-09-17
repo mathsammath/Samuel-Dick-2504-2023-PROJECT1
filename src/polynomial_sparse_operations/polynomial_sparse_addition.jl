@@ -12,7 +12,7 @@ Add a sparse polynomial and a term.
 function +(p::PolynomialSparse, t::Term)
     p = deepcopy(p)
     if t.degree ∈ [i.degree for i in p.lst] #Term of same degree exists in p
-         for i in 1:length(p.lst)
+         for i in 1:length(p.lst) #this is not correct. must change.
             if p.lst[i].degree == t.degree
                 p.lst[i] += t
             end 

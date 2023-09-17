@@ -152,7 +152,7 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state)
+iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state) #fix this.
 
 ##############################
 # Queries about a polynomial #
@@ -169,9 +169,16 @@ The leading term of the polynomial.
 leading(p::PolynomialSparse)::Term = isempty(p.lst) ? zero(Term) : last(p.lst) 
 
 """
-Returns the coefficients of the polynomial. (lowest to highest)
+Returns the coefficients of the polynomial. 
 """
-coeffs(p::PolynomialSparse)::Vector{Int} = [i.coeff for i in p.lst]
+function coeffs(p::PolynomialSparse)::Vector{Int}
+    coeff_v = Int[] #initialise 
+    f = deepcopy(p) #push! mutates p.
+    while length(f) > 0 
+        append!(coeff_v, pop!(f).coeff) #add coefficients to coeff_v
+    end 
+    return coeff_v 
+end 
 
 """
 The degree of the polynomial.
@@ -186,7 +193,14 @@ content(p::PolynomialSparse)::Int = euclid_alg(coeffs(p))
 """
 Evaluate the polynomial at a point `x`.
 """
-evaluate(f::PolynomialSparse, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
+function evaluate(f::PolynomialSparse, x::T) where T <: Number
+    eval = 0 #initialise 
+    p = deepcopy(f)
+    while length(p) > 0
+        eval += evaluate(pop!(p), x) #pop! terms and evaluate. 
+    end 
+    return eval 
+end 
 
 ################################
 # Pushing and popping of terms #
@@ -231,13 +245,13 @@ The negative of a sparse polynomial.
 Create a new sparse polynomial which is the derivative of the sparse polynomial.
 """
 function derivative(p::PolynomialSparse)::PolynomialSparse 
-    der_p = PolynomialSparse()
-    for term in p.lst
-        der_term = derivative(term)
-        !iszero(der_term) && push!(der_p,der_term)
-    end
-    return trim!(der_p)
-end
+    deriv_p = PolynomialSparse() #initialise derivaitve polynomial 
+    f = deepcopy(p)
+    for _ in 1:length(p)
+        !iszero(derivative(leading(f))) && push!(deriv_p, derivative(pop!(f)))
+    end 
+    return deriv_p 
+end  
 
 """
 The prim part (multiply a polynomial by the inverse of its content).
