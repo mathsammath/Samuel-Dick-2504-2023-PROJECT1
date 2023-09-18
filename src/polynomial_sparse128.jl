@@ -48,8 +48,8 @@ non-zero term.
 function trim!(p::PolynomialSparse128)::PolynomialSparse128
     i = length(p.lst)
     while i > 1
-        if iszero(p.lst[i])
-            pop!(p.lst)
+        if iszero(leading(p))
+            pop!(p)
         else
             break
         end
@@ -150,7 +150,7 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::PolynomialSparse128, state=1) = iterate([i for i in p.lst], state)
+iterate(p::PolynomialSparse128, state=1) = iterate(collect(p.lst), state)
 
 ##############################
 # Queries about a polynomial #
@@ -169,7 +169,14 @@ leading(p::PolynomialSparse128)::Term128 = isempty(p.lst) ? zero(Term128) : last
 """
 Returns the coefficients of the polynomial. (lowest to highest)
 """
-coeffs(p::PolynomialSparse128)::Vector{Int128} = [i.coeff for i in p.lst]
+function coeffs(p::PolynomialSparse)::Vector{Int128}
+    coeff_v = Int128[] #initialise 
+    f = deepcopy(p) #push! mutates p.
+    while length(f) > 0 
+        append!(coeff_v, pop!(f).coeff) 
+    end 
+    return coeff_v 
+end 
 
 """
 The degree of the polynomial.
@@ -184,7 +191,14 @@ content(p::PolynomialSparse128)::Int = euclid_alg(coeffs(p))
 """
 Evaluate the polynomial at a point `x`.
 """
-evaluate(f::PolynomialSparse128, x::T) where T <: Number = sum(evaluate(t,x) for t in f)
+function evaluate(f::PolynomialSparse128, x::T) where T <: Number
+    eval = 0 #initialise 
+    p = deepcopy(f)
+    while length(p) > 0
+        eval += evaluate(pop!(p), x) #pop! terms and evaluate. 
+    end 
+    return eval 
+end 
 
 ################################
 # Pushing and popping of terms #
@@ -228,13 +242,13 @@ The negative of a sparse polynomial.
 """
 Create a new sparse polynomial which is the derivative of the sparse polynomial.
 """
-function derivative(p::PolynomialSparse128)::PolynomialSparse128 
+function derivative(p::PolynomialSparse128)::PolynomialSparse128
     der_p = PolynomialSparse128()
-    for term in p.lst
-        der_term = derivative(term)
-        !iszero(der_term) && push!(der_p,der_term)
-    end
-    return trim!(der_p)
+    f = deepcopy(p)
+    for _ in 1:length(p)
+        !iszero(derivative(leading(f))) && push!(der_p, derivative(pop!(f)))
+    end 
+    return der_p
 end
 
 """
@@ -274,7 +288,16 @@ Subtraction of two sparse polynomials.
 """
 Multiplication of sparse polynomial and term.
 """
-*(t::Term128, p1::PolynomialSparse128)::PolynomialSparse128 = iszero(t) ? PolynomialSparse128() : PolynomialSparse128([i for i in map((pt)->t*pt, p1.lst)])
+function *(t::Term, p1::PolynomialSparse128)::PolynomialSparse128
+    iszero(t) ? PolynomialSparse() : 
+    p2 = deepcopy(p1) #pop mutates p1
+    p = PolynomialSparse128() 
+    for _ in 1:length(p2)
+       push!(p, pop!(p2)*t) #multiplication done term-by-term
+    end 
+    return p 
+end 
+
 *(p1::PolynomialSparse128, t::Term128)::PolynomialSparse128 = t*p1
 
 """
@@ -293,11 +316,13 @@ Warning this may not make sense if n does not divide all the coefficients of p.
 Take the mod of a sparse polynomial with an integer.
 """
 function mod(f::PolynomialSparse128, p::Int)::PolynomialSparse128
-    f_out = PolynomialSparse128()
-    for i in f.lst
-        f_out += mod(i,p) 
+    mod_p = PolynomialSparse128() #iniialise 
+    f_copy = deepcopy(f)
+    for _ in 1:length(f)
+        #compute modulo term by term, if mod is nonzero add to mod_p polynomial.
+        !iszero(mod(leading(f_copy), p)) ? push!(mod_p, mod(pop!(f_copy), p)) : pop!(f_copy)
     end 
-    return f_out     
+    return mod_p
 end
 
 """

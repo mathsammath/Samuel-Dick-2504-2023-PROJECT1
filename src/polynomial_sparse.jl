@@ -320,8 +320,7 @@ function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
     mod_p = PolynomialSparse() #iniialise 
     f_copy = deepcopy(f)
     for _ in 1:length(f)
-        #if mod(term, p) ≠ 0 then f_copy contains mod(term, p).
-        !iszero(mod(leading(f_copy), p)) && push!(mod_p, mod(pop!(f_copy), p)) 
+        !iszero(mod(leading(f_copy), p)) ? push!(mod_p, mod(pop!(f_copy), p)) : pop!(f_copy)
     end 
     return mod_p
 end
