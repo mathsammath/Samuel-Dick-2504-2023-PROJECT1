@@ -45,13 +45,13 @@ end
 
 """
 This function maintains the invariant of the Sparse Polynomial type so that there are no zero terms beyond the highest
-non-zero term.
+non-zero term. Sparse type does not store non-zero terms, as such, not entirely relevant for this type.
 """
 function trim!(p::PolynomialSparse)::PolynomialSparse
     i = length(p.lst)
     while i > 1
-        if iszero(p.lst[i])
-            pop!(p.lst)
+        if iszero(leading(p))
+            pop!(p)
         else
             break
         end
@@ -123,9 +123,6 @@ end
 """
 Show a sparse polynomial. May need to change this to better suit sparse. 
 """
-#Updated to improve "pretty printing" of polynomials.
-#e.g. 3 + 4x^2 + -3x^3 → -3x³ + 4x² + 3
-#refactored slightly for sparse polynomials 
 function show(io::IO, p::PolynomialSparse) 
     if iszero(p)
         print(io,"0")
@@ -152,7 +149,7 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::PolynomialSparse, state=1) = iterate([i for i in p.lst], state) #fix this.
+iterate(p::PolynomialSparse, state=1) = iterate(collect(x.lst), state)
 
 ##############################
 # Queries about a polynomial #
@@ -175,7 +172,7 @@ function coeffs(p::PolynomialSparse)::Vector{Int}
     coeff_v = Int[] #initialise 
     f = deepcopy(p) #push! mutates p.
     while length(f) > 0 
-        append!(coeff_v, pop!(f).coeff) #add coefficients to coeff_v
+        append!(coeff_v, pop!(f).coeff) 
     end 
     return coeff_v 
 end 
@@ -292,10 +289,10 @@ Multiplication of sparse polynomial and term.
 """
 function *(t::Term, p1::PolynomialSparse)::PolynomialSparse 
      iszero(t) ? PolynomialSparse() : 
-     p2 = deepcopy(p1) #pop! mutates p1
-     p = PolynomialSparse() #initialise 
+     p2 = deepcopy(p1) #pop mutates p1
+     p = PolynomialSparse() 
      for _ in 1:length(p2)
-        push!(p, pop!(p2)*t)
+        push!(p, pop!(p2)*t) #multiplication done term-by-term
      end 
      return p 
 end 
@@ -318,12 +315,13 @@ Warning this may not make sense if n does not divide all the coefficients of p.
 Take the mod of a sparse polynomial with an integer.
 """
 function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
-    q = PolynomialSparse() #initialise 
+    mod_p = PolynomialSparse() #iniialise 
     f_copy = deepcopy(f)
-    for _ in 1:length(f_copy)
-        !iszero(mod(leading(f_copy)), p) && push!(q, mod(pop!(f_copy), p)) 
+    for _ in 1:length(f)
+        #if mod(term, p) ≠ 0 then f_copy contains mod(term, p).
+        !iszero(mod(leading(f_copy), p)) && push!(mod_p, mod(pop!(f_copy), p)) 
     end 
-    return f_copy      
+    return mod_p
 end
 
 """
