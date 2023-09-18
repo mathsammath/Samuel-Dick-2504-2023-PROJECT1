@@ -127,8 +127,9 @@ function show(io::IO, p::PolynomialSparse)
     if iszero(p)
         print(io,"0")
     else
+        terms = collect(x.lst) #duplicate implementation from Dense type.
         first_term = true
-        lowest_to_highest == false ? ordering = reverse(p.lst) : ordering = x.lst
+        lowest_to_highest == false ? ordering = reverse(terms) : ordering = terms
         for (i,t) in enumerate(ordering)
             if first_term == true 
                 print(io, t) 
