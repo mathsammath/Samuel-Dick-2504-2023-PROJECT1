@@ -150,7 +150,7 @@ end
 """
 Allows to do iteration over the non-zero terms of the polynomial. This implements the iteration interface.
 """
-iterate(p::PolynomialSparse, state=1) = iterate(collect(x.lst), state)
+iterate(p::PolynomialSparse, state=1) = iterate(collect(p.lst), state)
 
 ##############################
 # Queries about a polynomial #
