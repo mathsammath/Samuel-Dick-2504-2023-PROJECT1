@@ -48,5 +48,5 @@ end
 """
 Add a sparse128 polynomial and an integer.
 """
-+(p::PolynomialSparse128, n::Int128) = p + Term128(n,0)
-+(n::Int128, p::PolynomialSparse128) = p + Term128(n,0)
++(p::PolynomialSparse128, n::Int) = p + Term128(Int128(n),0)
++(n::Int, p::PolynomialSparse128) = p + Term128(Int128(n),0)

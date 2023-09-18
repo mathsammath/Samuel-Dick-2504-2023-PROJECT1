@@ -288,7 +288,7 @@ Subtraction of two sparse polynomials.
 """
 Multiplication of sparse polynomial and term.
 """
-function *(t::Term, p1::PolynomialSparse128)::PolynomialSparse128
+function *(t::Term128, p1::PolynomialSparse128)::PolynomialSparse128
     iszero(t) ? PolynomialSparse() : 
     p2 = deepcopy(p1) #pop mutates p1
     p = PolynomialSparse128() 
