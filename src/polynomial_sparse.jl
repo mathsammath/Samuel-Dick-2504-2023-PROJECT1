@@ -127,18 +127,19 @@ function show(io::IO, p::PolynomialSparse)
     if iszero(p)
         print(io,"0")
     else
-        terms = collect(x.lst) #duplicate implementation from Dense type.
-        first_term = true
-        lowest_to_highest == false ? ordering = reverse(terms) : ordering = terms
+        first_term = true #first nonzero term printed differently to other terms.
+        lowest_to_highest == false ? ordering = reverse(p.lst) : ordering = p.lst #ordering of terms depends on state of lowest_to_highest variable.
         for (i,t) in enumerate(ordering)
-            if first_term == true 
-                print(io, t) 
-            else 
-                sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) 
-                sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) 
-            end 
-            first_term = false
-        end 
+            if !iszero(t)
+                if first_term == true 
+                    print(io, t) #will print negative with sign and positive without.
+                else 
+                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) #Terms with positive coefficients are "added"
+                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) #Terms with negative coefficients are "subtracted"
+                end 
+                first_term = false 
+            end
+        end
     end
 end
 
@@ -217,7 +218,7 @@ end
 Pop the leading term out of the sparse polynomial. When polynomial is 0, keep popping out 0.
 """
 function pop!(p::PolynomialSparse)::Term 
-    popped_term = leading(p) #popped term in leading term of polynomial 
+    popped_term = leading(p) #popped term is leading term of polynomial 
     if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
         push!(p, zero(Term))
     end 
@@ -243,13 +244,13 @@ The negative of a sparse polynomial.
 Create a new sparse polynomial which is the derivative of the sparse polynomial.
 """
 function derivative(p::PolynomialSparse)::PolynomialSparse 
-    deriv_p = PolynomialSparse() #initialise derivaitve polynomial 
+    der_p = PolynomialSparse()
     f = deepcopy(p)
     for _ in 1:length(p)
-        !iszero(derivative(leading(f))) && push!(deriv_p, derivative(pop!(f)))
+        !iszero(derivative(leading(f))) && push!(der_p, derivative(pop!(f)))
     end 
-    return deriv_p 
-end  
+    return der_p
+end
 
 """
 The prim part (multiply a polynomial by the inverse of its content).
