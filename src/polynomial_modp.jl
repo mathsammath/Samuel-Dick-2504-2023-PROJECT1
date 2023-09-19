@@ -58,17 +58,18 @@ PolynomialModP(p::Union{PolynomialSparse, PolynomialSparse128}, t::Int) = Polyno
 Construct a PolynomialModP with a single term and prime.
 """
 PolynomialModP(t::Union{Term, Term128}, p::Int) = PolynomialModP([t], p)
-#=
+
 """
-Construct a PolynomialModP of the form x^p-x given a prime.
+Construct a PolynomialModP of the form x^n-x given a prime.
 """
-cyclotonic_polynomial_modp(p::Int, n::Int) = PolynomialSparse([Term(1,p), Term(-1,0)])
+cyclotonic_polynomial_modp(::Type{PolynomialSparse}, p::Int, n::Int) = PolynomialModP([Term(1,n), Term(-1,0)], p)
+cyclotonic_polynomial_modp(::Type{PolynomialSparse128}, p::Int, n::Int) = PolynomialModP([Term128(Int128(1),n), Term128(Int128(-1),0)], p)
 
 """
 Construct a PolynomialModP of the form x-n.
 """
-linear_monic_polynomial_sparse(n::Int) = PolynomialSparse([Term(1,1), Term(-n,0)])
-=#
+linear_monic_polynomial_modp(::Type{PolynomialSparse}, p::Int, n::Int) = PolynomialModP([Term(1,1), Term(-n,0)], p)
+linear_monic_polynomial_modp(::Type{PolynomialSparse128}, p::Int, n::Int) = PolynomialModP([Term128(Int128(1),1), Term128(Int128(-n),0)], p)
 
 """
 Construct a PolynomialModP of the form x given a prime p.

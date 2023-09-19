@@ -11,7 +11,7 @@ Modular algorithm for PolynomialModP types.
 Assumes polynomials are over the same field. 
 """
 function divide(num::PolynomialModP, den::PolynomialModP)
-    return divide(num.s_poly, den.s_poly) #these need to be ModP!!!!
+    return divide(num.s_poly, den.s_poly) 
 end
 
 """
