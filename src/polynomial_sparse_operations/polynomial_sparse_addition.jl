@@ -10,6 +10,7 @@
 Add a sparse polynomial and a term.
 """
 function +(p::PolynomialSparse, t::Term)
+    iszero(t) && return p
     p = deepcopy(p)
     if t.degree ∈ keys(p.dict) #polynomial contains term of same degree
         add_term = get_element(p.lst, p.dict, t.degree) + t #sum terms of same degree 
@@ -24,7 +25,7 @@ end
 +(t::Term, p::PolynomialSparse) = p + t
 
 """
-Add two sparse polynomials.
+Add two polynomials of type PolynomialSparse.
 """
 function +(p1::PolynomialSparse, p2::PolynomialSparse)::PolynomialSparse
     q1 = deepcopy(p1) #pop! and push! mutate polynomials

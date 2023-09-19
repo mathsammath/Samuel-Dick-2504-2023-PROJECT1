@@ -24,7 +24,7 @@ end
 +(t::Term128, p::PolynomialSparse128) = p + t
 
 """
-Add two sparse128 polynomials.
+Add two polynomials of type PolynomialSparse128.
 """
 function +(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse128
     q1 = deepcopy(p1) #pop! and push! mutate polynomials

@@ -13,21 +13,21 @@ using DataStructures, Primes
 ####################################
 
 """
-A Polynomial type, PolynomialModP- designed for sparse polynomials with the 
-addition of working with coefficient arithmetic over Zₚ.  
+A Polynomial type, PolynomialModP- designed for polynomials (PolynomialSparse/PolynomialSparse128) 
+supporting coefficient arithmetic over Zₚ.  
 """
 struct PolynomialModP
     prime_mod::Int #prime
     s_poly::Union{PolynomialSparse, PolynomialSparse128} #sparse polynomial 
 
-    #Inner constructor for 0 PolynomialSparse
+    #Inner constructor for 0 PolynomialModP (PolynomialSparse) over some prime 
     function PolynomialModP(::Type{PolynomialSparse}, p::Int)
         prime_mod = p
         s_poly = PolynomialSparse()
         return new(prime_mod, s_poly)
     end 
 
-    #Inner constructor for 0 PolynomialSparse128
+    #Inner constructor for 0 PolynomialModP (PolynomialSparse128) over some prime 
     function PolynomialModP(::Type{PolynomialSparse128}, p::Int)
         prime_mod = p
         s_poly = PolynomialSparse128()
@@ -53,7 +53,6 @@ end
 Construct a PolynomialModP from a Sparse or Sparse128 type.
 """
 PolynomialModP(p::Union{PolynomialSparse, PolynomialSparse128}, t::Int) = PolynomialModP(collect(p.lst), t)
-
 
 """
 Construct a PolynomialModP with a single term and prime.
@@ -105,7 +104,7 @@ function rand(::Type{PolynomialModP} ;
                 condition = (p)->true)
         
     while true 
-        prime_mod = rand(primes(1,20)) #random prime p in range [1, 100]
+        prime_mod = rand(primes(1,20)) #random prime p in range 1:20
         _degree = degree == -1 ? rand(Poisson(mean_degree)) : degree
         _terms = terms == -1 ? rand(Binomial(_degree,prob_term)) : terms
         degrees = vcat(sort(sample(0:_degree-1,_terms,replace = false)),_degree)
@@ -153,13 +152,8 @@ leading(p::PolynomialModP) = isempty(p.s_poly.lst) ? zero(Term) : last(p.s_poly.
 """
 Returns the coefficients of the PolynomialModP. 
 """
-function coeffs(p::PolynomialModP)::Vector{Int}
-    coeff_v = Int[] #initialise 
-    f = deepcopy(p.s_poly) #push! mutates p.
-    while length(f) > 0 
-        append!(coeff_v, pop!(f).coeff) 
-    end 
-    return coeff_v 
+function coeffs(p::PolynomialModP)::Vector{Union{Int, Int128}}
+    coeffs(p.s_poly)
 end 
 
 """
@@ -218,7 +212,7 @@ The negative of a PolynomialModP.
 Create PolynomialModP which is the derivative of a PolynomialModP.
 """
 function derivative(p::PolynomialModP)::PolynomialModP
-    PolynomialModP(collect(derivative(p.s_poly).lst), p.prime_mod)
+    PolynomialModP(derivative(p.s_poly), p.prime_mod)
 end
 
 """
@@ -290,13 +284,7 @@ end
 """
 Power of a PolynomialModP mod prime.
 """
-#fix later... after changing ^ function
-function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
-    n < 0 && error("No negative power")
-    out = one(p)
-    for _ in 1:n
-        out *= p
-        out = mod(out, prime)
-    end
-    return out
+function pow_mod(p::PolynomialModP, n::Int, prime::Int)
+    x = PolynomialModP(p.s_poly, prime) #since we now want to work over a new prime 
+    return ^(x, n)
 end

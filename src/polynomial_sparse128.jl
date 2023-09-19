@@ -219,7 +219,7 @@ Pop the leading term out of the sparse polynomial. When polynomial is 0, keep po
 function pop!(p::PolynomialSparse128)::Term128 
     popped_term = leading(p) #popped term in leading term of polynomial
     if iszero(p) #if polynomial is zero polynomial, it must remain zero polynomial
-        push!(p, zero(Term128))
+        return popped_term 
     end 
     delete_element!(p.lst, p.dict, leading(p).degree) #helper function to delete element 
     return popped_term
