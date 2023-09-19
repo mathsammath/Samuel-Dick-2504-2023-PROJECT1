@@ -33,7 +33,7 @@ function +(p1::PolynomialSparse, p2::PolynomialSparse)::PolynomialSparse
     while !iszero(q1) || !iszero(q2)
         if degree(q1) == degree(q2) #degrees equal, add leading terms
             ltq1, ltq2 = pop!(q1), pop!(q2)
-            if ltq1 + ltq2 ≠ 0 #PolynomialSparse contains only nonzero terms
+            if !iszero(ltq1 + ltq2) #PolynomialSparse contains only nonzero terms
                 push!(sum_pol, ltq1 + ltq2)
             end 
         elseif degree(q1) > degree(q2)  

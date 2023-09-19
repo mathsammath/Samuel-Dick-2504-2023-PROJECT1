@@ -50,10 +50,15 @@ struct PolynomialModP
 end 
 
 """
+Construct a PolynomialModP from a Sparse or Sparse128 type.
+"""
+PolynomialModP(p::Union{PolynomialSparse, PolynomialSparse128}, t::Int) = PolynomialModP(collect(p.lst), t)
+
+
+"""
 Construct a PolynomialModP with a single term and prime.
 """
-PolynomialModP(t::Union{Term, Term128}, p::Int) = PolynomialSparse([t], p)
-
+PolynomialModP(t::Union{Term, Term128}, p::Int) = PolynomialModP([t], p)
 #=
 """
 Construct a PolynomialModP of the form x^p-x given a prime.
@@ -70,7 +75,7 @@ linear_monic_polynomial_sparse(n::Int) = PolynomialSparse([Term(1,1), Term(-n,0)
 Construct a PolynomialModP of the form x given a prime p.
 """
 x_poly_modp(::Type{PolynomialSparse}, p::Int) = PolynomialModP([Term(1,1)], p)
-x_poly_modp(::Type{PolynomialSparse128}) = PolynomialModP([Term128(Int128(1),1)], p)
+x_poly_modp(::Type{PolynomialSparse128}, p::Int) = PolynomialModP([Term128(Int128(1),1)], p)
 
 
 """
@@ -82,10 +87,10 @@ zero_modP(::Type{PolynomialSparse128}, p::Int)::PolynomialModP = PolynomialModP(
 """
 Creates the unit PolynomialModP given some prime.
 """
-one_modP(::Type{PolynomialSparse}, p)::PolynomialModP = PolynomialModP(one(Term), p)
-one_modP(::Type{PolynomialSparse128}, p)::PolynomialModP = PolynomialModP(one(Term128), p)
+one_modP(::Type{PolynomialSparse}, p)::PolynomialModP = PolynomialModP([one(Term)], p)
+one_modP(::Type{PolynomialSparse128}, p)::PolynomialModP = PolynomialModP([one(Term128)], p)
 
-#one(p::PolynomialModP) = one(typeof(p), p.prime_mod) something funny going on.
+one(p::PolynomialModP) = one_modP(typeof(p.s_poly), p.prime_mod) 
 
 """
 Generates a random PolynomialModP.
@@ -118,23 +123,8 @@ end
 Show a sparse polynomial. May need to change this to better suit sparse. 
 """
 function show(io::IO, p::PolynomialModP) 
-    if iszero(p)
-        print(io,"0")
-    else
-        first_term = true #first nonzero term printed differently to other terms.
-        lowest_to_highest == false ? ordering = reverse(p.s_poly.lst) : ordering = p.s_poly.lst #ordering of terms depends on state of lowest_to_highest variable.
-        for (i,t) in enumerate(ordering)
-            if !iszero(t)
-                if first_term == true 
-                    print(io, t) #will print negative with sign and positive without.
-                else 
-                    sign(t.coeff) > 0 && print(io, " + ", Term(abs(t.coeff), t.degree)) #Terms with positive coefficients are "added"
-                    sign(t.coeff) < 0 && print(io, " - ", Term(abs(t.coeff), t.degree)) #Terms with negative coefficients are "subtracted"
-                end 
-                first_term = false 
-            end
-        end
-    end
+    show(io, p.s_poly)
+    print(" (mod ", p.prime_mod, ")")
 end
 
 ##############################################
@@ -228,7 +218,7 @@ The negative of a PolynomialModP.
 Create PolynomialModP which is the derivative of a PolynomialModP.
 """
 function derivative(p::PolynomialModP)::PolynomialModP
-    derivative(p.s_poly)
+    PolynomialModP(collect(derivative(p.s_poly).lst), p.prime_mod)
 end
 
 """
@@ -254,59 +244,53 @@ Check if two PolynomialModP's are the same
 Check if a sparse polynomial is equal to 0.
 """
 #Note that in principle there is a problem here. E.g The polynomial 3 will return true to equalling the integer 2.
-==(p::PolynomialSparse, n::T) where T <: Real = iszero(p) == iszero(n)
+==(p::PolynomialModP, n::T) where T <: Real = iszero(p) == iszero(n)
 
 ##################################################################
 # Operations with two objects where at least one is a polynomial #
 ##################################################################
 
 """
-Subtraction of two sparse polynomials.
+Subtraction of two PolynomialModP's.
 """
--(p1::PolynomialSparse, p2::PolynomialSparse)::PolynomialSparse = p1 + (-p2)
+-(p1::PolynomialModP, p2::PolynomialModP)::PolynomialModP = p1 + (-p2)
 
 """
-Multiplication of sparse polynomial and term.
+Multiplication of a PolynomialModP and a term.
 """
-function *(t::Term, p1::PolynomialSparse)::PolynomialSparse 
-     iszero(t) ? PolynomialSparse() : 
-     p2 = deepcopy(p1) #pop mutates p1
-     p = PolynomialSparse() 
-     for _ in 1:length(p2)
-        push!(p, pop!(p2)*t) #multiplication done term-by-term
-     end 
-     return p 
+function *(t::Term, p1::PolynomialModP)::PolynomialModP
+    PolynomialModP(collect((*(t, p1.s_poly)).lst) , p1.prime_mod)
 end 
 
-*(p1::PolynomialSparse, t::Term)::PolynomialSparse = t*p1
+*(p1::PolynomialModP, t::Term)::PolynomialModP = t*p1
 
 """
-Multiplication of a sparse polynomial and an integer.
+Multiplication of a PolynomialModP and an integer.
 """
-*(n::Int, p::PolynomialSparse)::PolynomialSparse = p*Term(n,0)
-*(p::PolynomialSparse, n::Int)::PolynomialSparse = n*p
+function *(n::Int, p::PolynomialModP)::PolynomialModP
+     typeof(p.s_poly) == PolynomialSparse ? p*Term(n,0) : p*Term128(Int128(n), 0)
+end 
+
+*(p::PolynomialModP, n::Int)::PolynomialModP = n*p
 
 """
-Integer division of a sparse polynomial by an integer.
+Integer division of a PolynomialModP by an integer.
 
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
-÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) 
+#not working 
+÷(p::PolynomialModP, n::Int) = ÷(p.s_poly, n)
 """
-Take the mod of a sparse polynomial with an integer.
+Take the mod of a PolynomialModP with an integer.
 """
-function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
-    mod_p = PolynomialSparse() #iniialise 
-    f_copy = deepcopy(f)
-    for _ in 1:length(f)
-        !iszero(mod(leading(f_copy), p)) ? push!(mod_p, mod(pop!(f_copy), p)) : pop!(f_copy)
-    end 
-    return mod_p
+function mod(f::PolynomialModP, p::Int)::PolynomialModP
+    return PolynomialModP(f.s_poly, p)
 end
 
 """
-Power of a sparse polynomial mod prime.
+Power of a PolynomialModP mod prime.
 """
+#fix later... after changing ^ function
 function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
     n < 0 && error("No negative power")
     out = one(p)

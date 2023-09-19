@@ -312,7 +312,7 @@ Integer division of a sparse polynomial by an integer.
 
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
-÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), p.lst)) 
+÷(p::PolynomialSparse, n::Int) = (prime)->PolynomialSparse(map((pt)->((pt ÷ n)(prime)), collect(p.lst))) 
 """
 Take the mod of a sparse polynomial with an integer.
 """
