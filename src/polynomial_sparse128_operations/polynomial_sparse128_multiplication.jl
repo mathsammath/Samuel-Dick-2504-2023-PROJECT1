@@ -23,12 +23,15 @@ end
 Power of a sparse polynomial.
 """
 function ^(p::PolynomialSparse128, n::Int)
-    n < 0 && error("No negative power")
-    out = one(p)
-    for _ in 1:n
-        out *= p
-    end
-    return out
+    b = reverse(string(n; base=2))
+    ans, w = Int128(1), p
+    for i in 1:length(b)
+        if b[i] == '1'
+            ans = ans*w
+        end
+        w = w*w
+    end 
+    return ans 
 end
 
 """

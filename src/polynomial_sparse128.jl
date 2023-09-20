@@ -331,7 +331,6 @@ Power of a sparse polynomial mod prime.
 function pow_mod(p::PolynomialSparse128, n::Int, prime::Int)
     b = reverse(string(n; base=2))
     ans, w = Int128(1), mod(p, prime)
-    
     for i in 1:length(b)
         if b[i] == '1'
             ans = mod(ans*w, prime)
