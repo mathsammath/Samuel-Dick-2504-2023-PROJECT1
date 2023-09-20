@@ -329,9 +329,9 @@ end
 Power of a sparse polynomial mod prime. Re-factored using repeated squaring.
 """
 function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
-    b = reverse(string(n; base=2))
+    n < 0 && error("No negative power")
+    b = reverse(string(n; base=2)) #binary string representation of n, reversed.
     ans, w = Int(1), mod(p, prime)
-    
     for i in 1:length(b)
         if b[i] == '1'
             ans = mod(ans*w, prime)
