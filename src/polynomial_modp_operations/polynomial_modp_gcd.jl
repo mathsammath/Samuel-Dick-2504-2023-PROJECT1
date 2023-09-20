@@ -10,9 +10,8 @@
 The extended euclid algorithm for PolynomialModP types over p.
 Assumes polynomials are over the same field.
 """
-#not 100% sure if this is working!!!!
-function extended_euclid_alg(a::PolynomialModP, b::PolynomialModP) #remove prime
-    s_type = typeof(a.s_poly) #type either sparse of sparse128
+function extended_euclid_alg(a::PolynomialModP, b::PolynomialModP) 
+    s_type = typeof(a.s_poly) #type either PolynomialSparse or PolynomialSparse128
     old_r, r = a, b
     old_s, s = one_modP(s_type, a.prime_mod), zero_modP(s_type, a.prime_mod)
     old_t, t = zero_modP(s_type, a.prime_mod), one_modP(s_type, a.prime_mod)
@@ -33,4 +32,4 @@ end
 The GCD of two polynomials of type PolynomialModP modulo p.
 Assumes polynomials are over the same field.
 """
-gcd(a::PolynomialSparse, b::PolynomialSparse) = extended_euclid_alg(a,b) |> first
+gcd(a::PolynomialModP, b::PolynomialModP) = extended_euclid_alg(a,b) |> first

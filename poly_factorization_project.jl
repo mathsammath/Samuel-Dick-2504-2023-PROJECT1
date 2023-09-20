@@ -34,5 +34,11 @@ include("src/polynomial_sparse128.jl")
     include("src/polynomial_sparse128_operations/polynomial_sparse128_division.jl")
     include("src/polynomial_sparse128_operations/polynomial_sparse128_gcd.jl")
 
+include("src/polynomial_modp.jl")
+    include("src/polynomial_modp_operations/polynomial_modp_addition.jl")
+    include("src/polynomial_modp_operations/polynomial_modp_division.jl")
+    include("src/polynomial_modp_operations/polynomial_modp_gcd.jl")
+    include("src/polynomial_modp_operations/polynomial_modp_multiplication.jl")
+
 
 nothing

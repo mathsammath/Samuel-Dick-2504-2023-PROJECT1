@@ -169,7 +169,7 @@ leading(p::PolynomialSparse128)::Term128 = isempty(p.lst) ? zero(Term128) : last
 """
 Returns the coefficients of the polynomial. (lowest to highest)
 """
-function coeffs(p::PolynomialSparse)::Vector{Int128}
+function coeffs(p::PolynomialSparse128)::Vector{Int128}
     coeff_v = Int128[] #initialise 
     f = deepcopy(p) #push! mutates p.
     while length(f) > 0 
@@ -290,10 +290,10 @@ Multiplication of sparse polynomial and term.
 """
 function *(t::Term128, p1::PolynomialSparse128)::PolynomialSparse128
     iszero(t) ? PolynomialSparse() : 
-    p2 = deepcopy(p1) #pop mutates p1
+    p1 = deepcopy(p1) #pop mutates p1
     p = PolynomialSparse128() 
-    for _ in 1:length(p2)
-       push!(p, pop!(p2)*t) #multiplication done term-by-term
+    for _ in 1:length(p1)
+       push!(p, pop!(p1)*t) #multiplication done term-by-term
     end 
     return p 
 end 
@@ -303,8 +303,8 @@ end
 """
 Multiplication of a sparse polynomial and an integer.
 """
-*(n::Int, p::PolynomialSparse128)::PolynomialSparse128 = p*Term128(Int128(n),0)
-*(p::PolynomialSparse128, n::Int)::PolynomialSparse128 = n*p
+*(n::Int128, p::PolynomialSparse128)::PolynomialSparse128 = p*Term128(Int128(n),0)
+*(p::PolynomialSparse128, n::Int128)::PolynomialSparse128 = n*p
 
 """
 Integer division of a sparse polynomial by an integer.

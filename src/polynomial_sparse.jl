@@ -291,10 +291,10 @@ Multiplication of sparse polynomial and term.
 """
 function *(t::Term, p1::PolynomialSparse)::PolynomialSparse 
      iszero(t) ? PolynomialSparse() : 
-     p2 = deepcopy(p1) #pop mutates p1
+     p1 = deepcopy(p1) #pop mutates p1
      p = PolynomialSparse() 
-     for _ in 1:length(p2)
-        push!(p, pop!(p2)*t) #multiplication done term-by-term
+     for _ in 1:length(p1)
+        push!(p, pop!(p1)*t) #multiplication done term-by-term
      end 
      return p 
 end 

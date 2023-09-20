@@ -274,7 +274,7 @@ Integer division of a PolynomialModP by an integer.
 Warning this may not make sense if n does not divide all the coefficients of p.
 """
 #not working 
-÷(p::PolynomialModP, n::Int) = ÷(p.s_poly, n)
+÷(p::PolynomialModP, n::Int) = ÷(p.s_poly, n)(p.prime_mod)
 """
 Take the mod of a PolynomialModP with an integer.
 """

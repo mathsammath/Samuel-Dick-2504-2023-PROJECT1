@@ -58,6 +58,7 @@ function div_rem_test_poly_modp(;prime::Int = 101, N::Int = 10^4, seed::Int = 0)
         f2 = PolynomialModP(p2, prime_num) #as above
 
         f_prod = f1*f2
+
         q, r = PolynomialModP(PolynomialSparse, prime_num), PolynomialModP(PolynomialSparse, prime_num)
         try
             q, r = ÷(f_prod,f2), rem(f_prod,f2) #equivalent to result of div(q,r)
@@ -80,7 +81,7 @@ end
 """
 Test the extended euclid algorithm for sparse polynomials modulo p.
 """
-function ext_euclid_test_poly_modp(;prime::Int=101, N::Int = 10, seed::Int = 0) 
+function ext_euclid_test_poly_modp(N::Int = 10^4, seed::Int = 0) 
     Random.seed!(seed)
     for _ in 1:N
         p1 = rand(PolynomialSparse)
@@ -91,6 +92,8 @@ function ext_euclid_test_poly_modp(;prime::Int=101, N::Int = 10, seed::Int = 0)
         f2 = PolynomialModP(p2, prime_num) #as above
 
         g, s, t = extended_euclid_alg(f1, f2)
+        println(g, "\t", s, "\t", t)
+        println(f1, "\t", f2)
         @assert s*f1 + t*f2 - g == 0
     end
     println("ext_euclid_test_poly - PASSED")
