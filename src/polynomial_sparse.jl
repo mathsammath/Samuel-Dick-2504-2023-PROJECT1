@@ -326,7 +326,7 @@ function mod(f::PolynomialSparse, p::Int)::PolynomialSparse
 end
 
 """
-Power of a sparse polynomial mod prime.
+Power of a sparse polynomial mod prime. Re-factored using repeated squaring.
 """
 function pow_mod(p::PolynomialSparse, n::Int, prime::Int)
     n < 0 && error("No negative power")
