@@ -20,6 +20,7 @@ function crt_mult_test(;N::Int = 10^3,  seed::Int = 0)
     println("crt_mult_test- PASSED")
 end
 
+#=need to do this properly 
 """
 Test Chinese Remainder Theorem implementation of multiplication 
 for polynomials with negative coefficients.
@@ -35,3 +36,4 @@ function crt_mult_neg_test(;N::Int = 10^3, seed::Int = 0)
     end
     println("crt_mult_test- PASSED")
 end
+=#

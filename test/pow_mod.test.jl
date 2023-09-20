@@ -17,8 +17,6 @@ function pow_sparse_test(;N::Int = 10^3,  seed::Int = 0)
     for _ in 1:N
         p1 = rand(PolynomialSparse)
         n = rand(1:5) #for larger n, Sparse type overflows
-        #println(p1)
-        #println(n)
         @assert p1^n == old_pow(p1, n)
     end
     println("pow_sparse_test- PASSED")

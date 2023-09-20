@@ -20,7 +20,7 @@ include("src/polynomial_dense.jl")
     include("src/polynomial_dense_operations/polynomial_dense_multiplication.jl")
     include("src/polynomial_dense_operations/polynomial_dense_division.jl")
     include("src/polynomial_dense_operations/polynomial_dense_gcd.jl")
-    include("src/polynomial_dense_factorization/factor.jl")
+    include("src/polynomial_factorization/factor.jl")
 
 include("src/polynomial_sparse.jl")
     include("src/polynomial_sparse_operations/polynomial_sparse_addition.jl")
