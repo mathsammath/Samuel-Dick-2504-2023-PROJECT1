@@ -224,7 +224,7 @@ prim_part(p::PolynomialModP) = prim_part(p.s_poly)
 """
 A square free PolynomialModP.
 """
-#square_free(p::PolynomialSparse, prime::Int)::PolynomialSparse = (p ÷ gcd(p,derivative(p),prime))(prime) comeback to this. important for later
+square_free(p::PolynomialModP, prime::Int)::PolynomialModP = (p ÷ gcd(p,derivative(p),prime))(prime) 
 
 #################################
 # Queries about two polynomials #
