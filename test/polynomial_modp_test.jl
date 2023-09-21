@@ -81,7 +81,7 @@ function div_rem_test_poly_modp(;prime::Int = 101, N::Int = 10^4, seed::Int = 0)
 end
 
 """
-Test the push! method for PolynomialModP
+Test the push! method for polynomials of type PolynomialModP
 """
 function push_test_poly_modp(;N::Int = 10^3, seed::Int = 0)
     Random.seed!(seed)
@@ -104,7 +104,7 @@ end
 
 
 """
-Test the pop! method for sparse polynomials 
+Test the pop! method for polynomials of type PolynomialModP
 """
 function pop_test_poly_modp(;N::Int = 10^3, seed::Int = 0)
     Random.seed!(seed)

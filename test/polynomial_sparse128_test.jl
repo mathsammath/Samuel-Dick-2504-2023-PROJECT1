@@ -9,7 +9,7 @@
 #####################################################################################
 
 """
-Test product of sparse polynomials.
+Test product for polynomials of type PolynomialSparse128.
 """
 function prod_test_poly_sparse128(;N::Int = 30, N_prods::Int = 20, seed::Int = 0) #obviously taking a very long time (relatively)
     Random.seed!(seed)
@@ -33,7 +33,7 @@ function prod_test_poly_sparse128(;N::Int = 30, N_prods::Int = 20, seed::Int = 0
 end
 
 """
-Test derivative of sparse polynomials (as well as product).
+Test derivative for polynomials of type PolynomialSparse128.
 """
 function prod_derivative_test_poly_sparse128(;N::Int = 30,  seed::Int = 0)
     Random.seed!(seed)
@@ -49,7 +49,7 @@ end
 
 
 """
-Test division of sparse polynomials modulo p.
+Test division for polynomials of type PolynomialSparse128.
 """
 function division_test_poly_sparse128(;prime::Int = 101, N::Int = 10^3, seed::Int = 0) 
     Random.seed!(seed)
@@ -79,7 +79,7 @@ function division_test_poly_sparse128(;prime::Int = 101, N::Int = 10^3, seed::In
 end
 
 """
-Test the extended euclid algorithm for sparse polynomials modulo p.
+Test the extended euclid algorithm for polynomials of type PolynomialSparse128.
 """
 function ext_euclid_test_poly_sparse128(;prime::Int=101, N::Int = 30, seed::Int = 0) 
     Random.seed!(seed)
@@ -93,7 +93,7 @@ function ext_euclid_test_poly_sparse128(;prime::Int=101, N::Int = 30, seed::Int 
 end
 
 """
-Test the push! method for sparse polynomials
+Test the push! method for polynomials of type PolynomialSparse128.
 """
 function push_test_poly_sparse128(;N::Int = 10^3, seed::Int = 0)
     Random.seed!(seed)
@@ -116,7 +116,7 @@ end
 
 
 """
-Test the pop! method for sparse polynomials 
+Test the pop! method for polynomials of type PolynomialSparse128.
 """
 function pop_test_poly_sparse128(;N::Int = 10^3, seed::Int = 0)
     Random.seed!(seed)
@@ -131,7 +131,7 @@ end
 
 
 """
-Test the mod method for sparse polynomials. 
+Test the mod method for polynomials of type PolynomialSparse128.
 Polynomials tested mod 7 and mod 5. 
 Examples hardcoded. 
 """

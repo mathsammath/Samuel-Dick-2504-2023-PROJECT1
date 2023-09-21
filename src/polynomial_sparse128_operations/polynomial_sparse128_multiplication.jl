@@ -20,7 +20,7 @@ function *(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse12
 end
 
 """
-Power of a sparse polynomial.
+Power of a polynomial (type Sparse128).
 """
 function ^(p::PolynomialSparse128, n::Int)
     n < 0 && error("No negative power")
