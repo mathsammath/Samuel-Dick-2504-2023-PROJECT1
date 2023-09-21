@@ -118,8 +118,6 @@ end
 ###########
 # Display #
 ###########
-#come back to this.
-
 """
 Show a sparse polynomial. May need to change this to better suit sparse. 
 """
