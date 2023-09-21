@@ -29,7 +29,7 @@ function prod_test_poly_sparse128(;N::Int = 30, N_prods::Int = 20, seed::Int = 0
             p_base = prod
         end
     end
-    println("prod_test_poly - PASSED")
+    println("prod_test_poly_sparse128 - PASSED")
 end
 
 """
@@ -44,7 +44,7 @@ function prod_derivative_test_poly_sparse128(;N::Int = 30,  seed::Int = 0)
         p2d = derivative(p2)
         @assert (p1d*p2) + (p1*p2d) == derivative(p1*p2)
     end
-    println("prod_derivative_test_poly - PASSED")
+    println("prod_derivative_test_poly_sparse128 - PASSED")
 end
 
 
@@ -59,6 +59,8 @@ function division_test_poly_sparse128(;prime::Int = 101, N::Int = 10^3, seed::In
         p_prod = p1*p2
         q, r = PolynomialSparse128(), PolynomialSparse128()
         try
+            #cases where one of p_prod or p2 is a constant (consequence of rand function)
+            leading(p_prod).degree == 0 || leading(p2).degree == 0 ? continue : nothing             
             q, r = divide(p_prod, p2)(prime)
             if (q, r) == (nothing,nothing)
                 println("Unlucky prime: $p1 is reduced to $(p1 % prime) modulo $prime")
@@ -73,13 +75,13 @@ function division_test_poly_sparse128(;prime::Int = 101, N::Int = 10^3, seed::In
         end
         @assert iszero( mod(q*p2+r - p_prod, prime) )
     end
-    println("division_test_poly - PASSED")
+    println("division_test_poly_sparse128 - PASSED")
 end
 
 """
 Test the extended euclid algorithm for sparse polynomials modulo p.
 """
-function ext_euclid_test_poly_sparse128(;prime::Int=101, N::Int = 10, seed::Int = 0) 
+function ext_euclid_test_poly_sparse128(;prime::Int=101, N::Int = 30, seed::Int = 0) 
     Random.seed!(seed)
     for _ in 1:N
         p1 = rand(PolynomialSparse128)
@@ -87,7 +89,7 @@ function ext_euclid_test_poly_sparse128(;prime::Int=101, N::Int = 10, seed::Int 
         g, s, t = extended_euclid_alg(p1, p2, prime)
         @assert mod(s*p1 + t*p2 - g, prime) == 0
     end
-    println("ext_euclid_test_poly - PASSED")
+    println("ext_euclid_test_poly_sparse128 - PASSED")
 end
 
 """
@@ -109,7 +111,7 @@ function push_test_poly_sparse128(;N::Int = 10^3, seed::Int = 0)
             end 
         end
     end 
-    println("push_test_poly_sparse - PASSED")
+    println("push_test_poly_sparse128 - PASSED")
 end 
 
 
@@ -124,7 +126,7 @@ function pop_test_poly_sparse128(;N::Int = 10^3, seed::Int = 0)
         pop!(p)
         @assert lt ∉ p.lst #assert leading term has been removed from p1
     end 
-    println("pop_test_poly_sparse - PASSED")
+    println("pop_test_poly_sparse128 - PASSED")
 end 
 
 
@@ -135,28 +137,28 @@ Examples hardcoded.
 """
 function mod_test_poly_sparse128(p::Int = 7, q::Int = 5)
     x = x_poly_sparse128() 
-    p1 = 3x^7 + 7x^6 + 10x^5 + x^4 + 4x^3 + 2x^2
-    p2 = x^7 + 2x^6 + 20x^5 + 6x^4 + 2x^3 + 13x^2
-    p3 = x^7 + x^6 + 7x^5 + 30x^4 + 70x^3 + 140x^2
+    p1 = Int128(3)x^7 + Int128(7)x^6 + Int128(10)x^5 + x^4 + Int128(4)x^3 + Int128(2)x^2
+    p2 = x^7 + Int128(2)x^6 + Int128(20)x^5 + Int128(6)x^4 + Int128(2)x^3 + Int128(13)x^2
+    p3 = x^7 + x^6 + Int128(7)x^5 + Int128(30)x^4 + Int128(70)x^3 + Int128(140)x^2
 
     #mod(p1, 7) = 3⋅x⁷ + 3⋅x⁵ + x⁴ + 4⋅x³ + 2⋅x²
-    @assert mod(p1, p).lst == MutableLinkedList{Term128}(Term128(Int128(0),0), Term128(Int128(2),2), 
+    @assert mod(p1, p).lst == MutableLinkedList{Term128}(Term128(Int128(2),2), 
                                                             Term128(Int128(4),3), Term128(Int128(1),4), Term128(Int128(3),5), Term128(Int128(3),7))
     #mod(p1, 5) = 3⋅x⁷ + 2⋅x⁶ + x⁴ + 4⋅x³ + 2⋅x²
-    @assert mod(p1, q).lst == MutableLinkedList{Term128}(Term128(Int128(0),0), Term128(Int128(2),2), 
+    @assert mod(p1, q).lst == MutableLinkedList{Term128}(Term128(Int128(2),2), 
                                                             Term128(Int128(4),3), Term128(Int128(1),4), Term128(Int128(2),6), Term128(Int128(3),7))
     #mod(p2, 7) = x⁷ + 2⋅x⁶ + 6⋅x⁵ + 6⋅x⁴ + 2⋅x³ + 6⋅x²
     @assert mod(p2, p).lst == MutableLinkedList{Term128}(Term128(Int128(6),2), Term128(Int128(2),3), 
                                                             Term128(Int128(6),4), Term128(Int128(6),5), Term128(Int128(2),6), Term128(Int128(1),7))
     #mod(p2, 5) = x⁷ + 2⋅x⁶ + x⁴ + 2⋅x³ + 3⋅x²
-    @assert mod(p2, q).lst == MutableLinkedList{Term128}(Term128(Int128(0),0), Term128(Int128(3),2), 
+    @assert mod(p2, q).lst == MutableLinkedList{Term128}(Term128(Int128(3),2), 
                                                             Term128(Int128(2),3), Term128(Int128(1),4), Term128(Int128(2),6), Term128(Int128(1),7))
     #mod(p3, 7) = x⁷ + x⁶ + 2⋅x⁴
-    @assert mod(p3, p).lst == MutableLinkedList{Term128}(Term128(Int128(0),0), Term128(Int128(2),4), Term128(Int128(1),6), Term128(Int128(1),7))
+    @assert mod(p3, p).lst == MutableLinkedList{Term128}(Term128(Int128(2),4), Term128(Int128(1),6), Term128(Int128(1),7))
     #mod(p3, 5) = x⁷ + x⁶ + 2⋅x⁵
-    @assert mod(p3, q).lst == MutableLinkedList{Term128}(Term128(Int128(0),0), Term128(Int128(2),5), Term128(Int128(1),6), Term128(Int128(1),7))
+    @assert mod(p3, q).lst == MutableLinkedList{Term128}(Term128(Int128(2),5), Term128(Int128(1),6), Term128(Int128(1),7))
 
-    println("mod_test_poly_sparse - PASSED")
+    println("mod_test_poly_sparse128 - PASSED")
 end 
 
 """

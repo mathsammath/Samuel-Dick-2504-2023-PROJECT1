@@ -40,5 +40,12 @@ include("src/polynomial_modp.jl")
     include("src/polynomial_modp_operations/polynomial_modp_gcd.jl")
     include("src/polynomial_modp_operations/polynomial_modp_multiplication.jl")
 
-
+include("test/crt_test.jl")
+include("test/factorization_test.jl")
+include("test/integers_test.jl")
+include("test/polynomials_test.jl")
+include("test/polynomial_modp_test.jl")
+include("test/polynomial_sparse128_test.jl")
+include("test/polynomial_sparse_test.jl")
+include("test/pow_mod.test.jl")
 nothing

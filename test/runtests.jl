@@ -10,7 +10,6 @@ using Pkg
 Pkg.activate(".")
 
 include("../poly_factorization_project.jl")
-
 ####
 # Execute unit tests for integers
 ###

@@ -41,7 +41,7 @@ function prod_derivative_test_poly_modp(;N::Int = 10^3,  seed::Int = 0)
         p2d = derivative(p2)
         @assert (p1d*p2) + (p1*p2d) == derivative(p1*p2)
     end
-    println("prod_derivative_test_poly - PASSED")
+    println("prod_derivative_test_poly_modp - PASSED")
 end
 
 """
@@ -77,7 +77,7 @@ function div_rem_test_poly_modp(;prime::Int = 101, N::Int = 10^4, seed::Int = 0)
         end
         @assert iszero(q*f2+r - f_prod)
     end
-    println("division_test_poly - PASSED")
+    println("division_test_poly_modp - PASSED")
 end
 
 """
@@ -99,7 +99,7 @@ function push_test_poly_modp(;N::Int = 10^3, seed::Int = 0)
             end 
         end
     end 
-    println("push_test_poly_sparse - PASSED")
+    println("push_test_poly_modp - PASSED")
 end 
 
 
@@ -114,5 +114,5 @@ function pop_test_poly_modp(;N::Int = 10^3, seed::Int = 0)
         pop!(p)
         @assert lt ∉ p.s_poly.lst #assert leading term has been removed from p1
     end 
-    println("pop_test_poly_sparse - PASSED")
+    println("pop_test_poly_modp - PASSED")
 end 
