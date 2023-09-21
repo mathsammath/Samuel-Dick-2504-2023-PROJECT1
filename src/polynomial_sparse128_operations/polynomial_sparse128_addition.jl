@@ -7,7 +7,7 @@
 ########################################################################
 
 """
-Add a polynomial (sparse128) and a term.
+Add a polynomial of type PolynomialSparse128 and a term.
 """
 function +(p::PolynomialSparse128, t::Term128)
     p = deepcopy(p)
@@ -46,7 +46,7 @@ function +(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse12
 end
 
 """
-Add a sparse128 polynomial and an integer.
+Add a polynomial of type PolynomialSparse128 and an integer.
 """
 +(p::PolynomialSparse128, n::Union{Int, Int128}) = p + Term128(Int128(n),0)
 +(n::Union{Int,Int128}, p::PolynomialSparse128) = p + Term128(Int128(n),0)

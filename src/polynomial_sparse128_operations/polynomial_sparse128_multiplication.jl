@@ -8,7 +8,7 @@
 using Primes 
 
 """
-Multiply two sparse polynomials.
+Multiply two polynomials of type Sparse128.
 """
 function *(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse128
     p_out = PolynomialSparse128() #initialise result of multiplication
@@ -20,7 +20,7 @@ function *(p1::PolynomialSparse128, p2::PolynomialSparse128)::PolynomialSparse12
 end
 
 """
-Power of a polynomial (type Sparse128).
+Power of a polynomial of type Sparse128.
 """
 function ^(p::PolynomialSparse128, n::Int)
     n < 0 && error("No negative power")

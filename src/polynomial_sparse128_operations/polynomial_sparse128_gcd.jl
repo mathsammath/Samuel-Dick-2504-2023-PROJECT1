@@ -7,7 +7,7 @@
 #############################################################################
 
 """
-The extended euclid algorithm for polynomials modulo prime.
+The extended euclid algorithm for polynomials of type PolynomialSparse128 modulo prime.
 """
 function extended_euclid_alg(a::PolynomialSparse128, b::PolynomialSparse128, prime::Int)
     old_r, r = mod(a, prime), mod(b, prime)
@@ -27,6 +27,6 @@ function extended_euclid_alg(a::PolynomialSparse128, b::PolynomialSparse128, pri
 end
 
 """
-The GCD of two polynomials modulo prime.
+The GCD of two polynomials of type PolynomialSparse128 modulo prime.
 """
 gcd(a::PolynomialSparse128, b::PolynomialSparse128, prime::Int) = extended_euclid_alg(a,b,prime) |> first
