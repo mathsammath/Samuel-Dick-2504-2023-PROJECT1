@@ -1,4 +1,4 @@
-# 2504_2023_project1 - Polynomial Factorization
+Polynomial Factorization
 
 This project implements polynomial arithmetic and polynomial factorization for polynomials with integer coefficients. 
 
